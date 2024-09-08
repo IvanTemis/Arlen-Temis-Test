@@ -22,7 +22,7 @@ docker {
 	name "temis"
 	dockerfile file('Dockerfile')
 	copySpec.from(jar).rename(".*", "./target/app.jar")
-	buildArgs(['JAR_FILE':"./target/app.jar"])
+	buildArgs(['JAR_FILE':"./target/app.jar"]) //Si modificas esta variable ocupas modificar la configuración del Activador de Google Cloud
 }
 
 
