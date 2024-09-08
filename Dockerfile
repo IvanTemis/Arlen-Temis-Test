@@ -4,6 +4,8 @@ FROM openjdk:17-jdk-slim
 # Establece el directorio de trabajo en /app
 WORKDIR /app
 
+ENV HOST 0.0.0.0
+
 #Establece un argumento de ejecución
 ARG JAR_FILE
 
