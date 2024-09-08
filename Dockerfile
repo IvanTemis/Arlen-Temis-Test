@@ -14,4 +14,4 @@ COPY ${JAR_FILE} app.jar
 EXPOSE 8080
 
 # Ejecuta la aplicación
-ENTRYPOINT ["java", "-jar", "${JAR_FILE}"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
