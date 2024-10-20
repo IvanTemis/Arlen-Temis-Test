@@ -38,6 +38,7 @@ public class WhatsappBotController {
         return summary.getSummarize();
     }
 
+    //Se usa @RequestParam porque @RequestBody causa conflictos de formato con Twilio
     @PostMapping("/webhook")
     public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException {
         String userMessage = requestBody.get("Body");
