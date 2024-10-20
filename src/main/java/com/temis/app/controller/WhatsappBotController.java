@@ -3,12 +3,10 @@ package com.temis.app.controller;
 import java.io.IOException;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.temis.app.model.DocumentSummarizeDTO;
 import com.temis.app.service.SummarizeService;
@@ -27,6 +25,8 @@ public class WhatsappBotController {
     @Autowired
     private VirtualAssistantService virtualAssistantService;
 
+    Logger logger = LoggerFactory.getLogger(WhatsappBotController.class);
+
     @GetMapping("/ping")
     public String get(){
         return "Hola Mundo";
@@ -39,15 +39,12 @@ public class WhatsappBotController {
     }
 
     @PostMapping("/webhook")
-    public String receiveWhatsAppMessage(@RequestBody Map<String, String> requestBody) throws IOException, TwiMLException {
+    public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException {
         String userMessage = requestBody.get("Body");
+        String phoneNumber = requestBody.get("From");
 
-        String responseMessage = virtualAssistantService.respondToUserMessage(userMessage);
+        logger.info("WhatsappBotController: {}", requestBody);
 
-        Body body = new Body.Builder(responseMessage).build();
-        Message message = new Message.Builder().body(body).build();
-        MessagingResponse response = new MessagingResponse.Builder().message(message).build();
-
-        return response.toXml();
+        virtualAssistantService.respondToUserMessage(phoneNumber, userMessage);
     }
 }

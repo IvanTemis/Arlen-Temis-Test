@@ -1,5 +1,11 @@
 package com.temis.app.service.impl;
 
+import com.temis.app.config.properties.TwilioConfigProperties;
+import com.twilio.Twilio;
+import com.twilio.converter.Promoter;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.temis.app.service.VirtualAssistantService;
@@ -7,8 +13,15 @@ import com.temis.app.service.VirtualAssistantService;
 @Service
 public class VirtualAssistantServiceImpl implements VirtualAssistantService {
 
+    private final TwilioConfigProperties twilioConfigProperties;
+
+    @Autowired
+    public VirtualAssistantServiceImpl(TwilioConfigProperties twilioConfigProperties) {
+        this.twilioConfigProperties = twilioConfigProperties;
+    }
+
     @Override
-    public String respondToUserMessage(String userMessage) {
+    public void respondToUserMessage(String phoneNumber, String userMessage) {
         
         String response;
 
@@ -25,6 +38,10 @@ public class VirtualAssistantServiceImpl implements VirtualAssistantService {
             response = "Gracias por tu mensaje. Aún estoy aprendiendo, pero haré lo posible para ayudarte.";
         }
 
-        return response;
+        Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
+        Message message = Message.creator(
+                new com.twilio.type.PhoneNumber(phoneNumber),
+                new com.twilio.type.PhoneNumber(twilioConfigProperties.phoneNumber()),
+                        response).create();
     }
 }
