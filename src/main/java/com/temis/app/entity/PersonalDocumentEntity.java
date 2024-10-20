@@ -2,41 +2,42 @@ package com.temis.app.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.sql.Timestamp;
 
 @Data
 @Entity
 @Table(name = "personal_document")
 public class PersonalDocumentEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(unique = true, nullable = false)
-    Long Id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "personal_document_type_id")
-    PersonalDocumentTypeEntity documentType;
+    @JoinColumn(name = "personal_document_type_id", nullable = false)
+    private PersonalDocumentTypeEntity documentType;
 
     @Column(nullable = false)
-    String name;
+    private String name;
 
     @Column(nullable = false)
-    String path;
-
-    @Column(nullable = true)
-    String notes;
+    private Timestamp issueDate;
 
     @Column(nullable = false)
-    Timestamp issueDate;
+    private Timestamp expirationDate;
 
     @Column(nullable = false)
-    Timestamp receptionDate;
+    private Boolean isActive;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
 
     @Column(nullable = false)
-    Timestamp expirationDate;
+    private String path;
 
     @Column(nullable = false)
-    Timestamp lastUpdateDate;
+    private Timestamp receptionDate;
 
     @Column(nullable = false)
-    boolean isActive;
+    private Timestamp lastUpdateDate;
 }

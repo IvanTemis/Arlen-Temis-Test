@@ -7,12 +7,14 @@ import lombok.Data;
 @Entity
 @Table(name = "notary_document_type")
 public class NotaryDocumentTypeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(unique = true, nullable = false)
-    Long Id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    private Long id;
 
     @Column(nullable = false)
-    String name;
+    private String name;
 
     @Column(nullable = false)
-    String description;
+    private String description;
 }

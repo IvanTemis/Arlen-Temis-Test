@@ -6,36 +6,18 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "notary")
-public class NotaryEntity {
+@Table(name = "notary_client")
+public class NotaryClientEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String firstName;
 
     @Column(nullable = false)
-    private String responsible;
-
-    @Column(nullable = false)
-    private Integer number;
-
-    @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
-    private String city;
-
-    @Column(nullable = false)
-    private String state;
-
-    @Column(nullable = false)
-    private String country;
-
-    @Column(nullable = false)
-    private String zipCode;
+    private String lastName;
 
     @Column(nullable = false)
     private String email;
@@ -50,5 +32,8 @@ public class NotaryEntity {
     private Timestamp creationDate;
 
     @Column(nullable = false)
-    private Timestamp lastUpdateDate;
+    private String passwordHash;
+
+    @Column(columnDefinition = "TEXT")
+    private String comments;
 }

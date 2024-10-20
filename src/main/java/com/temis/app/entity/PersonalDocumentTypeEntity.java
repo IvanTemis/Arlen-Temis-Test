@@ -8,12 +8,13 @@ import lombok.Data;
 @Table(name = "personal_document_type")
 public class PersonalDocumentTypeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(unique = true, nullable = false)
-    Long Id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false)
+    private Long id;
 
     @Column(nullable = false)
-    String name;
+    private String name;
 
     @Column(nullable = false)
-    String description;
+    private String description;
 }
