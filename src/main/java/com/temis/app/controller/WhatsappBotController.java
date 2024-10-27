@@ -5,10 +5,8 @@ import java.util.Map;
 
 import com.temis.app.config.properties.TwilioConfigProperties;
 import com.temis.app.model.MessageHolderObject;
-import com.temis.app.model.MessageResponseObject;
 import com.temis.app.state.FirstContactState;
 import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +17,6 @@ import com.temis.app.model.DocumentSummarizeDTO;
 import com.temis.app.model.File;
 import com.temis.app.service.SummarizeService;
 import com.temis.app.service.VirtualAssistantService;
-import com.twilio.twiml.MessagingResponse;
-import com.twilio.twiml.messaging.Body;
 import com.twilio.twiml.TwiMLException;
 
 @RestController
@@ -57,10 +53,11 @@ public class WhatsappBotController {
     public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException {
         String userMessage = requestBody.get("Body");
         String phoneNumber = requestBody.get("From");
+        String nickName = requestBody.get("ProfileName");
 
         logger.info("WhatsappBotController: {}", requestBody);
 
-        if ("1".equals(requestBody.get("NumMedia"))) {
+        /*if ("1".equals(requestBody.get("NumMedia"))) {
             String mediaUrl = requestBody.get("MediaUrl0");
             String mediaType = requestBody.get("MediaContentType0");
             String profileName = requestBody.get("ProfileName");
@@ -80,9 +77,9 @@ public class WhatsappBotController {
 
             logger.info("Received file: {}", file);
 
-        }
+        }*/
 
-        var response = firstContactState.Evaluate(new MessageHolderObject(phoneNumber, requestBody));
+        var response = firstContactState.Evaluate(new MessageHolderObject(phoneNumber.replace("whatsapp:", ""), nickName, requestBody));
 
         //TODO: Reemplazar con una abstracción a una interfaz común
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());

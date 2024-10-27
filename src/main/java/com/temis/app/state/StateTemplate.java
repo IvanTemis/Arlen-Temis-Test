@@ -31,7 +31,7 @@ public abstract class StateTemplate {
     }
 
     //La información del MessageHolderObject puede ser modificada durante esta etapa para futuro uso en otros estados
-    public abstract boolean ShouldTransition(MessageHolderObject message);
+    protected abstract boolean ShouldTransition(MessageHolderObject message);
 
     protected abstract void Execute(MessageHolderObject message, MessageResponseObject.MessageResponseObjectBuilder responseBuilder);
 }
