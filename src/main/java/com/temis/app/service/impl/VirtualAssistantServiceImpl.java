@@ -13,13 +13,6 @@ import com.temis.app.service.VirtualAssistantService;
 @Service
 public class VirtualAssistantServiceImpl implements VirtualAssistantService {
 
-    private final TwilioConfigProperties twilioConfigProperties;
-
-    @Autowired
-    public VirtualAssistantServiceImpl(TwilioConfigProperties twilioConfigProperties) {
-        this.twilioConfigProperties = twilioConfigProperties;
-    }
-
     @Override
     public void respondToUserMessage(String phoneNumber, String userMessage) {
         
@@ -37,11 +30,5 @@ public class VirtualAssistantServiceImpl implements VirtualAssistantService {
             
             response = "Gracias por tu mensaje. Aún estoy aprendiendo, pero haré lo posible para ayudarte.";
         }
-
-        Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
-        Message message = Message.creator(
-                new com.twilio.type.PhoneNumber(phoneNumber),
-                new com.twilio.type.PhoneNumber(twilioConfigProperties.phoneNumber()),
-                        response).create();
     }
 }
