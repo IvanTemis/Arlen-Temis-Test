@@ -13,8 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import com.temis.app.model.DocumentSummarizeDTO;
+import com.temis.app.model.File;
 import com.temis.app.service.SummarizeService;
 import com.temis.app.service.VirtualAssistantService;
 import com.twilio.twiml.MessagingResponse;
@@ -34,6 +36,8 @@ public class WhatsappBotController {
     private FirstContactState firstContactState;
     @Autowired
     private TwilioConfigProperties twilioConfigProperties;
+    @Autowired
+    private RestTemplate restTemplate;
 
     Logger logger = LoggerFactory.getLogger(WhatsappBotController.class);
 
@@ -55,6 +59,28 @@ public class WhatsappBotController {
         String phoneNumber = requestBody.get("From");
 
         logger.info("WhatsappBotController: {}", requestBody);
+
+        if ("1".equals(requestBody.get("NumMedia"))) {
+            String mediaUrl = requestBody.get("MediaUrl0");
+            String mediaType = requestBody.get("MediaContentType0");
+            String profileName = requestBody.get("ProfileName");
+            String messageId = requestBody.get("MessageSid");
+
+            byte[] fileBytes = restTemplate.getForObject(mediaUrl, byte[].class);
+
+            File file = File.builder()
+                    .id(messageId)
+                    .source("WhatsApp")
+                    .mediaUrl(mediaUrl)
+                    .mediaType(mediaType)
+                    .senderInfo(phoneNumber)
+                    .profileName(profileName)
+                    .messageId(messageId)
+                    .build();
+
+            logger.info("Received file: {}", file);
+
+        }
 
         var response = firstContactState.Evaluate(new MessageHolderObject(phoneNumber, requestBody));
 
