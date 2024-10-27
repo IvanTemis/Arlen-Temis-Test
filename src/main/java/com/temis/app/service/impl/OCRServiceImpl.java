@@ -1,3 +1,5 @@
+package com.temis.app.service.impl;
+
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Service;
