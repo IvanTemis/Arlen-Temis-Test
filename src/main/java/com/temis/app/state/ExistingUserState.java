@@ -1,6 +1,6 @@
 package com.temis.app.state;
 
-import com.temis.app.model.MessageHolderObject;
+import com.temis.app.model.MessageContext;
 import com.temis.app.model.MessageResponseObject;
 import com.temis.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class ExistingUserState extends StateTemplate{
     }
 
     @Override
-    protected boolean ShouldTransition(MessageHolderObject message) {
+    protected boolean ShouldTransition(MessageContext message) {
 
         var users = userRepository.findByPhoneNumber(message.getPhoneNumber());
 
@@ -35,7 +35,7 @@ public class ExistingUserState extends StateTemplate{
     }
 
     @Override
-    protected void Execute(MessageHolderObject message, MessageResponseObject.MessageResponseObjectBuilder responseBuilder) {
+    protected void Execute(MessageContext message, MessageResponseObject.MessageResponseObjectBuilder responseBuilder) {
         assert message.getUserEntity() != null;
 
         String name = message.getUserEntity().getNickName();

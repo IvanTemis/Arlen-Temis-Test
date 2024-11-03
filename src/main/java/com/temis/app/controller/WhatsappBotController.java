@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.temis.app.config.properties.TwilioConfigProperties;
-import com.temis.app.model.MessageHolderObject;
+import com.temis.app.model.MessageContext;
 import com.temis.app.state.FirstContactState;
 import com.twilio.Twilio;
 import org.slf4j.Logger;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import com.temis.app.model.DocumentSummarizeDTO;
-import com.temis.app.model.File;
 import com.temis.app.service.SummarizeService;
 import com.temis.app.service.VirtualAssistantService;
 import com.twilio.twiml.TwiMLException;
@@ -79,7 +78,10 @@ public class WhatsappBotController {
 
         }*/
 
-        var response = firstContactState.Evaluate(new MessageHolderObject(phoneNumber.replace("whatsapp:", ""), nickName, requestBody));
+        var response = firstContactState.Evaluate(MessageContext.builder()
+                .phoneNumber(phoneNumber.replace("whatsapp:", ""))
+                .nickName(nickName)
+                .request(requestBody).build());
 
         //TODO: Reemplazar con una abstracción a una interfaz común
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
