@@ -1,7 +1,8 @@
 package com.temis.app.state;
 
-import com.temis.app.model.MessageContext;
-import com.temis.app.model.MessageResponseObject;
+import com.temis.app.entity.MessageContextEntity;
+import com.temis.app.entity.MessageResponseEntity;
+import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 public class ExistingUserState extends StateTemplate{
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MessageContextRepository messageContextRepository;
 
     public ExistingUserState() {
         super(new ArrayList<>(){
@@ -21,13 +24,13 @@ public class ExistingUserState extends StateTemplate{
     }
 
     @Override
-    protected boolean ShouldTransition(MessageContext message) {
+    protected boolean ShouldTransition(MessageContextEntity message) {
 
         var users = userRepository.findByPhoneNumber(message.getPhoneNumber());
 
         if(!users.isEmpty()){
             message.setUserEntity(users.get(0));
-
+            messageContextRepository.save(message);
             return true;
         }
 
@@ -35,7 +38,7 @@ public class ExistingUserState extends StateTemplate{
     }
 
     @Override
-    protected void Execute(MessageContext message, MessageResponseObject.MessageResponseObjectBuilder responseBuilder) {
+    protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
         assert message.getUserEntity() != null;
 
         String name = message.getUserEntity().getNickName();

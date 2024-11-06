@@ -1,8 +1,8 @@
 package com.temis.app.state.with_user;
 
+import com.temis.app.entity.MessageContextEntity;
+import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.entity.UserEntity;
-import com.temis.app.model.MessageContext;
-import com.temis.app.model.MessageResponseObject;
 import com.temis.app.state.StateTemplate;
 
 import java.util.List;
@@ -13,20 +13,20 @@ public abstract class StateWithUserTemplate extends StateTemplate {
     }
 
     @Override
-    protected boolean ShouldTransition(MessageContext message) {
+    protected boolean ShouldTransition(MessageContextEntity message) {
         assert message.getUserEntity() != null;
 
         return ShouldTransitionWithUser(message, message.getUserEntity());
     }
 
-    protected abstract boolean ShouldTransitionWithUser(MessageContext message, UserEntity user);
+    protected abstract boolean ShouldTransitionWithUser(MessageContextEntity message, UserEntity user);
 
     @Override
-    protected void Execute(MessageContext message, MessageResponseObject.MessageResponseObjectBuilder responseBuilder) {
+    protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
         assert message.getUserEntity() != null;
 
         ExecuteWithUser(message, responseBuilder, message.getUserEntity());
     }
 
-    protected abstract void ExecuteWithUser(MessageContext message, MessageResponseObject.MessageResponseObjectBuilder responseBuilder, UserEntity user);
+    protected abstract void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user);
 }

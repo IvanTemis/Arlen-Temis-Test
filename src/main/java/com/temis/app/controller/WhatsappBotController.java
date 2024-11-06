@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.temis.app.config.properties.TwilioConfigProperties;
-import com.temis.app.model.MessageContext;
+import com.temis.app.entity.MessageContextEntity;
+import com.temis.app.model.MessageSource;
 import com.temis.app.state.FirstContactState;
 import com.twilio.Twilio;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import com.twilio.twiml.TwiMLException;
 
 @RestController
 @RequestMapping("/whatsapp-bot")
+@Slf4j
 public class WhatsappBotController {
 
     @Autowired
@@ -33,8 +36,6 @@ public class WhatsappBotController {
     private TwilioConfigProperties twilioConfigProperties;
     @Autowired
     private RestTemplate restTemplate;
-
-    Logger logger = LoggerFactory.getLogger(WhatsappBotController.class);
 
     @GetMapping("/ping")
     public String get(){
@@ -54,7 +55,7 @@ public class WhatsappBotController {
         String phoneNumber = requestBody.get("From");
         String nickName = requestBody.get("ProfileName");
 
-        logger.info("WhatsappBotController: {}", requestBody);
+        log.info("WhatsappBotController: {}", requestBody);
 
         /*if ("1".equals(requestBody.get("NumMedia"))) {
             String mediaUrl = requestBody.get("MediaUrl0");
@@ -78,15 +79,16 @@ public class WhatsappBotController {
 
         }*/
 
-        var response = firstContactState.Evaluate(MessageContext.builder()
+        var response = firstContactState.Evaluate(MessageContextEntity.builder()
                 .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                 .nickName(nickName)
+                .messageSource(MessageSource.TWILIO)
                 .request(requestBody).build());
 
         //TODO: Reemplazar con una abstracción a una interfaz común
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
         com.twilio.rest.api.v2010.account.Message.creator(
-                new com.twilio.type.PhoneNumber(response.getPhoneNumber()),
+                new com.twilio.type.PhoneNumber("whatsapp:" + response.getPhoneNumber()),
                 new com.twilio.type.PhoneNumber(twilioConfigProperties.phoneNumber()),
                 response.getBody()).create();
 

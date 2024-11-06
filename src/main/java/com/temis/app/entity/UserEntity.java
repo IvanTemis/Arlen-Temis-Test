@@ -2,12 +2,17 @@ package com.temis.app.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @Entity
 @Table(name = "temis_user")
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +34,13 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
-    private Timestamp creationDate;
+    @Column(nullable = false, updatable = false)
+    @CreatedDate
+    private Date createdDate;
+
+    @Column(nullable = false, updatable = false)
+    @LastModifiedDate
+    private Date lastModifiedDate;
 
     @Column(nullable = false)
     private Boolean isActive;
