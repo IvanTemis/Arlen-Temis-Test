@@ -1,5 +1,7 @@
 package com.temis.app.entity;
 
+import com.temis.app.model.MessageSource;
+import com.temis.app.model.RequirementType;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,47 +9,31 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.sql.Timestamp;
 
+import static jakarta.persistence.EnumType.STRING;
+
 @Data
 @Entity
-@Table(name = "notary")
-public class NotaryEntity {
+@Table(name = "requirement")
+public class RequirementEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    @Enumerated(STRING)
+    RequirementType requirementType;
 
     @Column(nullable = false)
-    private String responsible;
+    private Boolean isCompleted = false;
 
-    @Column(nullable = false)
-    private Integer number;
+    @JoinColumn(name = "service_id", nullable = false)
+    @ManyToOne(optional = false, targetEntity = ServiceEntity.class)
+    ServiceEntity serviceEntity;
 
-    @Column(nullable = false)
-    private String address;
-
-    @Column(nullable = false)
-    private String city;
-
-    @Column(nullable = false)
-    private String state;
-
-    @Column(nullable = false)
-    private String country;
-
-    @Column(nullable = false)
-    private String zipCode;
-
-    @Column(nullable = false)
-    private String email;
-
-    @Column(nullable = false)
-    private String phoneNumber;
-
-    @Column(nullable = false)
-    private Boolean isActive;
+    @JoinColumn(nullable = true, name = "document_id")
+    @OneToOne(optional = true, targetEntity = DocumentEntity.class)
+    DocumentEntity documentEntity;
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -58,7 +44,4 @@ public class NotaryEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Timestamp creationDate;
-
-    @Column(nullable = false)
-    private Timestamp lastUpdateDate;
 }

@@ -1,7 +1,11 @@
 package com.temis.app.entity;
 
+import com.temis.app.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -14,32 +18,39 @@ public class NotaryDocumentEntity {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "notary_document_type_id", nullable = true)
-    private NotaryDocumentTypeEntity documentType;
+    @JoinColumn(nullable = false, name = "document_id")
+    @OneToOne(optional = false, targetEntity = DocumentEntity.class)
+    DocumentEntity documentEntity;
+
+    @JoinColumn(nullable = false, name = "service_id")
+    @ManyToOne(optional = false, targetEntity = ServiceEntity.class)
+    ServiceEntity serviceEntity;
+
+    @Column(columnDefinition = "TEXT")
+    private String resume;
+
+    @Column(nullable = true)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Timestamp signatureDate;
+
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "keywords")
+    private Set<String> keywords;
 
     @Column(nullable = false)
-    private String name;
+    @Temporal(TemporalType.TIMESTAMP)
+    @LastModifiedDate
+    private Timestamp lastModifiedDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreatedDate
     private Timestamp creationDate;
 
     @Column(nullable = false)
     private Boolean isActive;
 
-    @Column(columnDefinition = "TEXT")
-    private String resume;
-
-    @Column(nullable = false)
-    private String path;
-
-    @Column(nullable = false)
-    private Timestamp lastUpdateDate;
-
-    @Column(nullable = false)
-    private Timestamp signatureDate;
-
-    @ElementCollection
-    @Column(name = "keywords")
-    private Set<String> keywords;
+    @JoinTable(name = "document_generation_input", joinColumns = @JoinColumn(name = "notary_document_id"), inverseJoinColumns = @JoinColumn(name = "document_id"))
+    @ManyToMany(targetEntity = DocumentEntity.class)
+    Set<DocumentEntity> generationInput;
 }

@@ -18,7 +18,7 @@ import static jakarta.persistence.EnumType.STRING;
 @Builder
 @Getter
 @Entity
-@Table
+@Table(name = "message_response")
 @EntityListeners(AuditingEntityListener.class)
 public class MessageResponseEntity {
     @Id
@@ -37,7 +37,7 @@ public class MessageResponseEntity {
     @ManyToOne(optional = true, targetEntity = UserEntity.class)
     UserEntity userEntity;
 
-    @JoinColumn(nullable = false, updatable = false)
+    @JoinColumn(nullable = false, updatable = false, name = "message_context_id")
     @ManyToOne(optional = false, targetEntity = MessageContextEntity.class)
     MessageContextEntity messageContextEntity;
 
