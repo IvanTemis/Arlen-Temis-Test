@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import javax.annotation.Nullable;
 import java.sql.Timestamp;
 import java.util.Set;
 
@@ -28,6 +29,17 @@ public class NotaryDocumentEntity {
 
     @Column(columnDefinition = "TEXT")
     private String resume;
+
+    @Column(columnDefinition = "TEXT", nullable = true)
+    private String feedback;
+
+    @Column(nullable = false)
+    private Integer version = 1;
+
+    @Nullable
+    @JoinColumn(nullable = true, name = "previous_version_id")
+    @OneToOne(optional = true, targetEntity = NotaryDocumentEntity.class)
+    NotaryDocumentEntity previousVersionEntity;
 
     @Column(nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
