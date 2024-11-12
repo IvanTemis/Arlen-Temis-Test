@@ -57,6 +57,6 @@ public class DocumentEntity {
     @LastModifiedDate
     private Timestamp lastModifiedDate;
 
-    @ManyToMany(targetEntity = NotaryDocumentEntity.class)
-    Set<NotaryDocumentEntity> generationInput;
+    @ManyToMany(mappedBy = "generationInput")
+    Set<NotaryDocumentEntity> generationOutput;
 }

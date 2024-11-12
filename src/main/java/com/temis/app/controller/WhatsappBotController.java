@@ -1,6 +1,7 @@
 package com.temis.app.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.temis.app.config.properties.TwilioConfigProperties;
@@ -9,8 +10,7 @@ import com.temis.app.model.MessageSource;
 import com.temis.app.state.FirstContactState;
 import com.twilio.Twilio;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -57,7 +57,9 @@ public class WhatsappBotController {
 
         log.info("WhatsappBotController: {}", requestBody);
 
-        /*if ("1".equals(requestBody.get("NumMedia"))) {
+        Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
+
+        /*if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
             String mediaUrl = requestBody.get("MediaUrl0");
             String mediaType = requestBody.get("MediaContentType0");
             String profileName = requestBody.get("ProfileName");
@@ -82,15 +84,35 @@ public class WhatsappBotController {
         var response = firstContactState.Evaluate(MessageContextEntity.builder()
                 .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                 .nickName(nickName)
+                .body(userMessage)
                 .messageSource(MessageSource.TWILIO)
                 .request(requestBody).build());
 
         //TODO: Reemplazar con una abstracción a una interfaz común
-        Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
-        com.twilio.rest.api.v2010.account.Message.creator(
+        var message = com.twilio.rest.api.v2010.account.Message.creator(
                 new com.twilio.type.PhoneNumber("whatsapp:" + response.getPhoneNumber()),
                 new com.twilio.type.PhoneNumber(twilioConfigProperties.phoneNumber()),
-                response.getBody()).create();
+                        "");
 
+        if(response.getQuickActions() == null || response.getQuickActions().isEmpty()){
+            message.setBody(response.getBody());
+        }
+        else {
+            assert response.getQuickActions().size() == 1;
+
+            message.setContentSid("HXfe43ff1faacb77d06dbcd87bc39af681")
+                    .setContentVariables(new JSONObject(new HashMap<String, Object>() {
+                        {
+                            put("body", response.getBody());
+                            put("1", response.getQuickActions().get(0));
+                        }
+                    }).toString());
+        }
+
+        if(response.getMediaURL() != null){
+            message.setMediaUrl(response.getMediaURL());
+        }
+
+        message.create();
     }
 }

@@ -1,19 +1,16 @@
 package com.temis.app.entity;
 
-import com.temis.app.converter.JsonConverter;
-import com.temis.app.model.MessageSource;
+import com.temis.app.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
+import java.net.URI;
 import java.util.Date;
-import java.util.Map;
-
-import static jakarta.persistence.EnumType.STRING;
+import java.util.List;
 
 @Builder
 @Getter
@@ -31,6 +28,13 @@ public class MessageResponseEntity {
 
     @Column(nullable = false)
     private String body;
+
+    @Convert(converter = StringListConverter.class)
+    @Column(nullable = true)
+    private List<String> quickActions;
+
+    @Column(nullable = true)
+    URI mediaURL;
 
     @Nullable
     @JoinColumn(nullable = true, updatable = false)

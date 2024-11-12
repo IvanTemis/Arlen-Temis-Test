@@ -2,20 +2,15 @@ package com.temis.app.state;
 
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
-import com.temis.app.entity.UserEntity;
 import com.temis.app.repository.MessageContextRepository;
-import com.temis.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 @Component
 public class FirstContactState extends StateTemplate{
 
-    @Autowired
-    private UserRepository userRepository;
     @Autowired
     private MessageContextRepository messageContextRepository;
 
@@ -40,15 +35,8 @@ public class FirstContactState extends StateTemplate{
 
     @Override
     protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
-        var newUser = new UserEntity();
 
-        newUser.setPhoneNumber(message.getPhoneNumber());
-        newUser.setNickName(message.getNickName());
-        newUser.setIsActive(true);
-
-        userRepository.save(newUser);
-
-        responseBuilder.body("Hola mamahuevo");
+        responseBuilder.body("¡Hola! Soy el agente de IA de TEMIS.\nActualmente me encuentro en *Beta Cerrada* y parece que no has sido habilitado para usar este servicio.\n\n(Si consideras que esto es un error, por favor contacta a los administradores)");
     }
 
 }

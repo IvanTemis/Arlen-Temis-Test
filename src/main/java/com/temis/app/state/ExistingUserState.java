@@ -4,6 +4,7 @@ import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.repository.UserRepository;
+import com.temis.app.state.with_user.BeginDocumentCreationState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,10 +18,11 @@ public class ExistingUserState extends StateTemplate{
     @Autowired
     private MessageContextRepository messageContextRepository;
 
-    public ExistingUserState() {
-        super(new ArrayList<>(){
-
-        });
+    @Autowired
+    public ExistingUserState(BeginDocumentCreationState beginDocumentCreationState) {
+        super(new ArrayList<>(){{
+            add(beginDocumentCreationState);
+        }});
     }
 
     @Override
@@ -48,5 +50,8 @@ public class ExistingUserState extends StateTemplate{
         }
 
         responseBuilder.body(MessageFormat.format("¡Hola {0}! ¿En qué puedo ayudarte hoy?", name));
+        responseBuilder.quickActions(new ArrayList<>(){{
+            add(BeginDocumentCreationState.compraventa);
+        }});
     }
 }
