@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import javax.annotation.Nullable;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -47,4 +48,8 @@ public class UserEntity {
 
     @Column(nullable = true)
     private String passwordHash;
+
+    @Nullable
+    @OneToOne(mappedBy="userEntity", targetEntity = NotaryEmployeeEntity.class, optional = true)
+    private NotaryEmployeeEntity employee;
 }

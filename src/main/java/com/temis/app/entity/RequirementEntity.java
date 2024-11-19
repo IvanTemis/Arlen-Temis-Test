@@ -1,8 +1,8 @@
 package com.temis.app.entity;
 
-import com.temis.app.model.MessageSource;
 import com.temis.app.model.RequirementType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import static jakarta.persistence.EnumType.STRING;
 
 @Data
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @Table(name = "requirement")
 public class RequirementEntity {
@@ -44,4 +45,8 @@ public class RequirementEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Timestamp creationDate;
+
+    public static RequirementEntityBuilder builder(ServiceEntity service) {
+        return hiddenBuilder().serviceEntity(service);
+    }
 }

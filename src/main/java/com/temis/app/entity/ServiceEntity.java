@@ -3,6 +3,7 @@ package com.temis.app.entity;
 import com.temis.app.model.RequirementType;
 import com.temis.app.model.ServiceState;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -12,6 +13,7 @@ import java.util.List;
 import static jakarta.persistence.EnumType.STRING;
 
 @Data
+@Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @Table(name = "service")
 public class ServiceEntity {
@@ -48,4 +50,8 @@ public class ServiceEntity {
 
     @Column(nullable = false)
     private Boolean isActive;
+
+    public static ServiceEntityBuilder builder(NotaryEmployeeEntity employee) {
+        return hiddenBuilder().employeeEntity(employee).notary(employee.getNotary());
+    }
 }
