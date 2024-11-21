@@ -1,5 +1,6 @@
 package com.temis.app.config;
 
+import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.VertexAIClient;
 
 import java.io.IOException;
@@ -22,6 +23,15 @@ public class VertexAiConfig {
     @Bean
     public VertexAIClient vertexAIClient() throws IOException {
         return new VertexAIClient(
+                vertexAiConfigProperties.projectId(),
+                vertexAiConfigProperties.location(),
+                vertexAiConfigProperties.modelName()
+        );
+    }
+
+    @Bean
+    public ChatAIClient chatAIClient() throws IOException {
+        return new ChatAIClient(
                 vertexAiConfigProperties.projectId(),
                 vertexAiConfigProperties.location(),
                 vertexAiConfigProperties.modelName()

@@ -26,14 +26,14 @@ public class MessageResponseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
     @Convert(converter = StringListConverter.class)
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private List<String> quickActions;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     URI mediaURL;
 
     @Nullable

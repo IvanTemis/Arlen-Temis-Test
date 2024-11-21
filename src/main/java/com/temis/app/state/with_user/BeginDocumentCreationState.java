@@ -27,11 +27,10 @@ public class BeginDocumentCreationState extends  StateWithUserTemplate{
     }
 
     @Override
-    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) {
+    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws URISyntaxException {
         responseBuilder.body("*No hace nada*");
-        try {
-            responseBuilder.mediaURL(new URI("https://images7.memedroid.com/images/UPLOADED213/63f303757e38e.jpeg"));
-        } catch (URISyntaxException ignored) {
-        }
+
+        responseBuilder.mediaURL(new URI("https://images7.memedroid.com/images/UPLOADED213/63f303757e38e.jpeg"));
+
     }
 }

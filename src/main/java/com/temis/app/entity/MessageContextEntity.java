@@ -35,7 +35,7 @@ public class MessageContextEntity {
     @Column(nullable = false)
     String nickName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     String body;
 
     @Column(nullable = false)

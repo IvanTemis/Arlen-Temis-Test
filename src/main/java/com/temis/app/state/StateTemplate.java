@@ -43,7 +43,18 @@ public abstract class StateTemplate {
                 .userEntity(message.getUserEntity());
 
         log.info("Executing State for Message with Id: {}", message.getId());
-        Execute(message, responseBuilder);
+
+        try {
+            Execute(message, responseBuilder);
+        } catch (Exception e) {
+            //Creamos un builder vacío para asegurar el contenido del mensaje de error;
+            responseBuilder = MessageResponseEntity.builder()
+                    .messageContextEntity(message)
+                    .phoneNumber(message.getPhoneNumber())
+                    .userEntity(message.getUserEntity())
+                    .body("Parece que hubo un error durante tu solicitud. Por favor contacta al administrador.");
+            log.error("An error occurred during state evaluation", e);
+        }
 
         return messageResponseRepository.save(responseBuilder.build());
     }
@@ -51,5 +62,5 @@ public abstract class StateTemplate {
     //La información del MessageHolderObject puede ser modificada durante esta etapa para futuro uso en otros estados
     protected abstract boolean ShouldTransition(MessageContextEntity message);
 
-    protected abstract void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder);
+    protected abstract void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) throws Exception;
 }

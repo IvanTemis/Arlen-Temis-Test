@@ -46,7 +46,7 @@ public class NotaryDocumentEntity {
     private Timestamp signatureDate;
 
     @Convert(converter = StringListConverter.class)
-    @Column(name = "keywords")
+    @Column(name = "keywords", columnDefinition = "TEXT")
     private Set<String> keywords;
 
     @Column(nullable = false)

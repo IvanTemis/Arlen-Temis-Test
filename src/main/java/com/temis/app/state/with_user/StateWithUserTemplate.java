@@ -22,11 +22,11 @@ public abstract class StateWithUserTemplate extends StateTemplate {
     protected abstract boolean ShouldTransitionWithUser(MessageContextEntity message, UserEntity user);
 
     @Override
-    protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
+    protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) throws Exception {
         assert message.getUserEntity() != null;
 
         ExecuteWithUser(message, responseBuilder, message.getUserEntity());
     }
 
-    protected abstract void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user);
+    protected abstract void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws Exception;
 }

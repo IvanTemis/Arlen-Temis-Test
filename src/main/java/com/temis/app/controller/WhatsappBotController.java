@@ -9,6 +9,7 @@ import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.model.MessageSource;
 import com.temis.app.state.FirstContactState;
 import com.twilio.Twilio;
+import com.twilio.rest.api.v2010.account.message.Media;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,9 @@ public class WhatsappBotController {
 
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
 
-        /*if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
+        /*Media.fetcher(,).fetch();
+
+        if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
             String mediaUrl = requestBody.get("MediaUrl0");
             String mediaType = requestBody.get("MediaContentType0");
             String profileName = requestBody.get("ProfileName");
@@ -67,7 +70,7 @@ public class WhatsappBotController {
 
             byte[] fileBytes = restTemplate.getForObject(mediaUrl, byte[].class);
 
-            File file = File.builder()
+            /*File file = File.builder()
                     .id(messageId)
                     .source("WhatsApp")
                     .mediaUrl(mediaUrl)
@@ -77,7 +80,7 @@ public class WhatsappBotController {
                     .messageId(messageId)
                     .build();
 
-            logger.info("Received file: {}", file);
+            log.info("Received file: {}", file);
 
         }*/
 
