@@ -11,12 +11,14 @@ import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.entity.UserEntity;
 import com.temis.app.entity.VertexAiContentEntity;
 import com.temis.app.model.VertexAiRole;
+import com.temis.app.repository.UserRepository;
 import com.temis.app.repository.VertexAiContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
@@ -27,6 +29,8 @@ public class AIChatState extends  StateWithUserTemplate{
 
     @Autowired
     VertexAiContentRepository vertexAiContextRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     public AIChatState() {
@@ -41,58 +45,63 @@ public class AIChatState extends  StateWithUserTemplate{
     @Override
 protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
 
-    if (message.getBody().isEmpty()) {
-        responseBuilder.body("Lo siento, no puedo procesar mensajes que no sean texto.");
-        return;
-    }
+        if (message.getBody().isEmpty()) {
+            responseBuilder.body("Lo siento, no puedo procesar mensajes que no sean texto.");
+            return;
+        }
 
-    var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
+        var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
-    List<Content> history = new ArrayList<>();
+        List<Content> history = new ArrayList<>();
 
-    for (var item : contexts) {
-        var c = Content.newBuilder()
-                .setRole(item.getRole().name())
-                .addAllParts(item.getParts().stream().map(p -> {
-                    try {
-                        return Part.parseFrom(p);
-                    } catch (InvalidProtocolBufferException e) {
-                        throw new RuntimeException(e);
-                    }
-                }).toList())
+        for (var item : contexts) {
+            var c = Content.newBuilder()
+                    .setRole(item.getRole().name())
+                    .addAllParts(item.getParts().stream().map(p -> {
+                        try {
+                            return Part.parseFrom(p);
+                        } catch (InvalidProtocolBufferException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).toList())
+                    .build();
+            history.add(c);
+        }
+
+        var content = Content.newBuilder()
+                .setRole(VertexAiRole.USER.name())
+                .addParts(Part.newBuilder().setText(message.getBody()).build())
                 .build();
-        history.add(c);
-    }
 
-    var content = Content.newBuilder()
-            .setRole(VertexAiRole.USER.name())
-            .addParts(Part.newBuilder().setText(message.getBody()).build())
-            .build();
-
-    vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
+        vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
 
         String name = user.getNickName();
 
-        if(user.getFirstName() != null){
+        if (user.getFirstName() != null) {
             name = user.getFirstName();
 
-            if(user.getLastName() != null){
+            if (user.getLastName() != null) {
                 name += " " + user.getLastName();
             }
         }
 
-    var response = chatAIClient.sendMessage(content, history,
-            "*Contexto de la conversación:*\n" +
-            "\n" +
-            "* *Usuario:* El usuario se llama \"" + name + "\".\n" +
-            "* *Fecha:* La fecha actual es " + java.time.LocalDateTime.now() + ".\n"
-            );
+        var response = chatAIClient.sendMessage(content, history,
+                "\n" +
+                        "Contexto de la conversación:\n" +
+                        "\n" +
+                        " - Usuario: El usuario se llama \"" + name + "\".\n" +
+                        " - Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
+                        " - Fecha y Hora de la última interacción: " + (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n"
+        );
 
-    String rawResponse = ResponseHandler.getText(response);
-    //String conciseResponse = chatAIClient.filterResponse(rawResponse);
+        String rawResponse = ResponseHandler.getText(response);
+        //String conciseResponse = chatAIClient.filterResponse(rawResponse);
 
-    vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response)));
+        vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response)));
 
-    responseBuilder.body(rawResponse);
+        responseBuilder.body(rawResponse);
+
+        user.setLastInteractionDate(new Date());
+        userRepository.save(user);
     }
 }

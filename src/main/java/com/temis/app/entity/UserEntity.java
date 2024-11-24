@@ -35,6 +35,9 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String phoneNumber;
 
+    @Column(nullable = true)
+    private Date lastInteractionDate;
+
     @Column(nullable = false, updatable = false)
     @CreatedDate
     private Date createdDate;

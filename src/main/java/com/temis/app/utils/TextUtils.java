@@ -14,7 +14,7 @@ public class TextUtils {
         if (text == null || text.isEmpty()) {
             return new ArrayList<>();
         }
-        return Arrays.stream(text.split("\\n"))
+        return Arrays.stream(text.split("\\?LL\\?"))
                 .map(String::trim)
                 .filter(sentence -> !sentence.isEmpty())
                 //.map(sentence -> sentence + ".")
