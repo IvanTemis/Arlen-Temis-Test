@@ -1,7 +1,9 @@
 package com.temis.app.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -9,8 +11,12 @@ import com.temis.app.config.properties.TwilioConfigProperties;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.model.MessageSource;
 import com.temis.app.state.FirstContactState;
+import com.temis.app.utils.TextUtils;
+
 import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.message.Media;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,18 +35,21 @@ public class WhatsappBotController {
 
     @Autowired
     private SummarizeService summarizeService;
+
     @Autowired
     private VirtualAssistantService virtualAssistantService;
 
     @Autowired
     private FirstContactState firstContactState;
+
     @Autowired
     private TwilioConfigProperties twilioConfigProperties;
+
     @Autowired
     private RestTemplate restTemplate;
 
     @GetMapping("/ping")
-    public String get(){
+    public String get() {
         return "Hola Mundo";
     }
 
@@ -50,7 +59,6 @@ public class WhatsappBotController {
         return summary.getSummarize();
     }
 
-    //Se usa @RequestParam porque @RequestBody causa conflictos de formato con Twilio
     @PostMapping("/webhook")
     public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException {
         String userMessage = requestBody.get("Body");
@@ -61,30 +69,6 @@ public class WhatsappBotController {
 
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
 
-        /*Media.fetcher(,).fetch();
-
-        if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
-            String mediaUrl = requestBody.get("MediaUrl0");
-            String mediaType = requestBody.get("MediaContentType0");
-            String profileName = requestBody.get("ProfileName");
-            String messageId = requestBody.get("MessageSid");
-
-            byte[] fileBytes = restTemplate.getForObject(mediaUrl, byte[].class);
-
-            /*File file = File.builder()
-                    .id(messageId)
-                    .source("WhatsApp")
-                    .mediaUrl(mediaUrl)
-                    .mediaType(mediaType)
-                    .senderInfo(phoneNumber)
-                    .profileName(profileName)
-                    .messageId(messageId)
-                    .build();
-
-            log.info("Received file: {}", file);
-
-        }*/
-
         var response = firstContactState.Evaluate(MessageContextEntity.builder()
                 .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                 .nickName(nickName)
@@ -92,34 +76,42 @@ public class WhatsappBotController {
                 .messageSource(MessageSource.TWILIO)
                 .request(requestBody).build());
 
-        log.info("Response Generated: {}",  new Gson().toJson(response));
+        log.info("Response Generated: {}", new Gson().toJson(response));
 
-        //TODO: Reemplazar con una abstracción a una interfaz común
-        //TODO: Dividir mensajes por \n y enviarlos por separado
-        var message = com.twilio.rest.api.v2010.account.Message.creator(
-                new com.twilio.type.PhoneNumber("whatsapp:" + response.getPhoneNumber()),
-                new com.twilio.type.PhoneNumber(twilioConfigProperties.phoneNumber()),
-                        "");
+        List<String> sentences = TextUtils.splitIntoSentences(response.getBody());
 
-        if(response.getQuickActions() == null || response.getQuickActions().isEmpty()){
-            message.setBody(response.getBody());
+        for (String sentence : sentences) {
+            var message = Message.creator(
+                    new PhoneNumber("whatsapp:" + response.getPhoneNumber()),
+                    new PhoneNumber(twilioConfigProperties.phoneNumber()),
+                    sentence
+            );
+
+            if (response.getMediaURL() != null) {
+                message.setMediaUrl(response.getMediaURL());
+            }
+
+            message.create();
         }
-        else {
+
+        if (response.getQuickActions() != null && !response.getQuickActions().isEmpty()) {
             assert response.getQuickActions().size() == 1;
 
-            message.setContentSid("HXfe43ff1faacb77d06dbcd87bc39af681")
+            var actionMessage = Message.creator(
+                    new PhoneNumber("whatsapp:" + response.getPhoneNumber()),
+                    new PhoneNumber(twilioConfigProperties.phoneNumber()),
+                    ""
+            );
+
+            actionMessage.setContentSid("HXfe43ff1faacb77d06dbcd87bc39af681")
                     .setContentVariables(new JSONObject(new HashMap<String, Object>() {
                         {
                             put("body", response.getBody());
                             put("1", response.getQuickActions().get(0));
                         }
                     }).toString());
-        }
 
-        if(response.getMediaURL() != null){
-            message.setMediaUrl(response.getMediaURL());
+            actionMessage.create();
         }
-
-        message.create();
     }
 }
