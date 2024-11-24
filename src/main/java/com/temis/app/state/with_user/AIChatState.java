@@ -38,43 +38,45 @@ public class AIChatState extends  StateWithUserTemplate{
     }
 
     @Override
-    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
+protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
 
-        if(message.getBody().isEmpty()){
-            responseBuilder.body("Lo siento, no puedo procesar mensajes que no sean texto.");
-            return;
-        }
+    if (message.getBody().isEmpty()) {
+        responseBuilder.body("Lo siento, no puedo procesar mensajes que no sean texto.");
+        return;
+    }
 
-        var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
+    var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
-        List<Content> history = new ArrayList<>();
+    List<Content> history = new ArrayList<>();
 
-        for (var item : contexts){
-            var c = Content.newBuilder()
-                    .setRole(item.getRole().name())
-                    .addAllParts(item.getParts().stream().map(p -> {
-                        try {
-                            return Part.parseFrom(p);
-                        } catch (InvalidProtocolBufferException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).toList())
-                    .build();
-            history.add(c);
-        }
-
-        var content = Content.newBuilder()
-                .setRole(VertexAiRole.USER.name())
-                .addParts(Part.newBuilder().setText(message.getBody()).build())
+    for (var item : contexts) {
+        var c = Content.newBuilder()
+                .setRole(item.getRole().name())
+                .addAllParts(item.getParts().stream().map(p -> {
+                    try {
+                        return Part.parseFrom(p);
+                    } catch (InvalidProtocolBufferException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList())
                 .build();
+        history.add(c);
+    }
 
-        vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
+    var content = Content.newBuilder()
+            .setRole(VertexAiRole.USER.name())
+            .addParts(Part.newBuilder().setText(message.getBody()).build())
+            .build();
 
-        //TODO: No soporta mensajes sin texto
-        var response = chatAIClient.sendMessage(content, history);
+    vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
 
-        vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response)));
+    var response = chatAIClient.sendMessage(content, history);
 
-        responseBuilder.body(ResponseHandler.getText(response));
+    String rawResponse = ResponseHandler.getText(response);
+    String conciseResponse = chatAIClient.filterResponse(rawResponse);
+
+    vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response)));
+
+    responseBuilder.body(conciseResponse);
     }
 }
