@@ -94,7 +94,7 @@ public class WhatsappBotController {
             message.create();
         }
 
-        if (response.getQuickActions() != null && !response.getQuickActions().isEmpty()) {
+        /*if (response.getQuickActions() != null && !response.getQuickActions().isEmpty()) {
             assert response.getQuickActions().size() == 1;
 
             var actionMessage = Message.creator(
@@ -112,6 +112,6 @@ public class WhatsappBotController {
                     }).toString());
 
             actionMessage.create();
-        }
+        }*/
     }
 }

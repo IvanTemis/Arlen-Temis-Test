@@ -3,7 +3,6 @@ package com.temis.app.client;
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.*;
 import com.google.cloud.vertexai.generativeai.*;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -13,7 +12,9 @@ import java.util.List;
 public class ChatAIClient {
 
     private final VertexAI vertexAi;
-    private final GenerativeModel model;
+    private final GenerativeModel baseModel;
+
+    private final String systemInstruction;
 
     // Constructor para inicializar con los parámetros dinámicos
     public ChatAIClient(String projectId, String location, String modelName) throws IOException {
@@ -21,7 +22,7 @@ public class ChatAIClient {
 
         // Configuración de generación y seguridad por defecto
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
-                .setMaxOutputTokens(256)
+                .setMaxOutputTokens(512)
                 .setTemperature(0.5F)
                 .setTopP(0.9F)
                 .build();
@@ -46,7 +47,7 @@ public class ChatAIClient {
         );
 
        // Instrucción del sistema por defecto
-        String systemInstruction = "*Valentina, Asistente Legal Especializada en Constitución de Empresas en México*\n" +
+        systemInstruction = "*Valentina, Asistente Legal Especializada en Constitución de Empresas en México*\n" +
                                 "\n" +
                                 "*Contexto:*\n" +
                                 "\n" +
@@ -75,10 +76,11 @@ public class ChatAIClient {
                                 "\n" +
                                 "* *Exclusividad:* Asegúrate de que todas las interacciones refuercen la relación del cliente con la Firma Valanz.\n" +
                                 "* *Confidencialidad:* Maneja la información del cliente con total discreción y seguridad.\n" +
+                                "* *Formato:* Divide cada oración con un salto de linea.\n" +
                                 "* *Protocolos internos:* Sigue los procedimientos establecidos por la Lic. Zélica Castro para la validación de documentos y el manejo de pagos.\n";
                 
         // Construir el modelo generativo
-        this.model = new GenerativeModel.Builder()
+        this.baseModel = new GenerativeModel.Builder()
                 .setModelName(modelName)
                 .setVertexAi(vertexAi)
                 .setGenerationConfig(generationConfig)
@@ -92,7 +94,10 @@ public class ChatAIClient {
         this.vertexAi.close();
     }
 
-    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history) throws IOException {
+    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String context) throws IOException {
+        var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
+
+
         ChatSession chatSession = model.startChat();
 
         if(history != null) chatSession.setHistory(history);
@@ -102,11 +107,11 @@ public class ChatAIClient {
 
     public String filterResponse(String response) {
         // Limita las respuestas a un máximo de 4 oraciones
-        String[] sentences = response.split("\\.");
+        String[] sentences = response.split("\\n");
         int maxSentences = Math.min(sentences.length, 4);
         StringBuilder filteredResponse = new StringBuilder();
         for (int i = 0; i < maxSentences; i++) {
-            filteredResponse.append(sentences[i].trim()).append(". ");
+            filteredResponse.append(sentences[i].trim()); //.append(". ")
         }
         return filteredResponse.toString().trim();
     }

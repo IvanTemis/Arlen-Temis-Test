@@ -4,6 +4,7 @@ import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.api.Part;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.type.DateTime;
 import com.temis.app.client.ChatAIClient;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
@@ -70,13 +71,28 @@ protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEnti
 
     vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
 
-    var response = chatAIClient.sendMessage(content, history);
+        String name = user.getNickName();
+
+        if(user.getFirstName() != null){
+            name = user.getFirstName();
+
+            if(user.getLastName() != null){
+                name += " " + user.getLastName();
+            }
+        }
+
+    var response = chatAIClient.sendMessage(content, history,
+            "*Contexto de la conversación:*\n" +
+            "\n" +
+            "* *Usuario:* El usuario se llama \"" + name + "\".\n" +
+            "* *Fecha:* La fecha actual es " + java.time.LocalDateTime.now() + ".\n"
+            );
 
     String rawResponse = ResponseHandler.getText(response);
-    String conciseResponse = chatAIClient.filterResponse(rawResponse);
+    //String conciseResponse = chatAIClient.filterResponse(rawResponse);
 
     vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response)));
 
-    responseBuilder.body(conciseResponse);
+    responseBuilder.body(rawResponse);
     }
 }
