@@ -40,6 +40,11 @@ public class AIChatState extends  StateWithUserTemplate{
     @Override
     protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
 
+        if(message.getBody().isEmpty()){
+            responseBuilder.body("Lo siento, no puedo procesar mensajes que no sean texto.");
+            return;
+        }
+
         var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
         List<Content> history = new ArrayList<>();

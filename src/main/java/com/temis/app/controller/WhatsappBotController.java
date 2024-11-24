@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.temis.app.config.properties.TwilioConfigProperties;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.model.MessageSource;
@@ -91,7 +92,10 @@ public class WhatsappBotController {
                 .messageSource(MessageSource.TWILIO)
                 .request(requestBody).build());
 
+        log.info("Response Generated: {}",  new Gson().toJson(response));
+
         //TODO: Reemplazar con una abstracción a una interfaz común
+        //TODO: Dividir mensajes por \n y enviarlos por separado
         var message = com.twilio.rest.api.v2010.account.Message.creator(
                 new com.twilio.type.PhoneNumber("whatsapp:" + response.getPhoneNumber()),
                 new com.twilio.type.PhoneNumber(twilioConfigProperties.phoneNumber()),
