@@ -1,8 +1,6 @@
 package com.temis.app.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +14,9 @@ import com.temis.app.utils.TextUtils;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
-
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 import com.temis.app.model.DocumentSummarizeDTO;
 import com.temis.app.service.SummarizeService;
@@ -45,9 +40,6 @@ public class WhatsappBotController {
     @Autowired
     private TwilioConfigProperties twilioConfigProperties;
 
-    @Autowired
-    private RestTemplate restTemplate;
-
     @GetMapping("/ping")
     public String get() {
         return "Hola Mundo";
@@ -60,7 +52,7 @@ public class WhatsappBotController {
     }
 
     @PostMapping("/webhook")
-    public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException {
+    public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException, InterruptedException {
         String userMessage = requestBody.get("Body");
         String phoneNumber = requestBody.get("From");
         String nickName = requestBody.get("ProfileName");
@@ -69,12 +61,21 @@ public class WhatsappBotController {
 
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
 
-        var response = firstContactState.Evaluate(MessageContextEntity.builder()
+        var messageContextBuilder = MessageContextEntity.builder()
                 .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                 .nickName(nickName)
                 .body(userMessage)
                 .messageSource(MessageSource.TWILIO)
-                .request(requestBody).build());
+                .request(requestBody);
+
+
+        if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
+
+            messageContextBuilder.mediaUrl(requestBody.get("MediaUrl0")).mediaContentType(requestBody.get("MediaContentType0"));
+
+        }
+
+        var response = firstContactState.Evaluate(messageContextBuilder.build());
 
         log.info("Response Generated: {}", new Gson().toJson(response));
 
@@ -92,9 +93,10 @@ public class WhatsappBotController {
             }
 
             message.create();
+            Thread.sleep(1000);
         }
 
-        if (response.getQuickActions() != null && !response.getQuickActions().isEmpty()) {
+        /*if (response.getQuickActions() != null && !response.getQuickActions().isEmpty()) {
             assert response.getQuickActions().size() == 1;
 
             var actionMessage = Message.creator(
@@ -112,6 +114,6 @@ public class WhatsappBotController {
                     }).toString());
 
             actionMessage.create();
-        }
+        }*/
     }
 }

@@ -38,6 +38,14 @@ public class MessageContextEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     String body;
 
+    @Nullable
+    @Column(nullable = true, columnDefinition = "TEXT")
+    String mediaUrl;
+
+    @Nullable
+    @Column(nullable = true)
+    String mediaContentType;
+
     @Column(nullable = false)
     @Enumerated(STRING)
     MessageSource messageSource;
