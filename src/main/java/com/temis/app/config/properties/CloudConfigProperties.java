@@ -1,10 +1,11 @@
 package com.temis.app.config.properties;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-@Getter
+@Getter @Setter
 @ConfigurationProperties("cloud")
 public class CloudConfigProperties {
     String projectId;
@@ -17,12 +18,12 @@ public class CloudConfigProperties {
     StorageConfigProperties storage;
 
 
-    @Getter
+    @Getter @Setter
     public static class VertexAiConfigProperties{
         String modelName;
     }
 
-    @Getter
+    @Getter @Setter
     public static class StorageConfigProperties{
         String bucketName;
     }

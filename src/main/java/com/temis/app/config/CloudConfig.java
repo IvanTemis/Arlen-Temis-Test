@@ -1,7 +1,7 @@
 package com.temis.app.config;
 
 import com.temis.app.client.ChatAIClient;
-import com.temis.app.client.CloudStorageClient;
+//import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.VertexAIClient;
 
 import java.io.IOException;

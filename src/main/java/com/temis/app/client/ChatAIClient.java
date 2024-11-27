@@ -67,7 +67,7 @@ public class ChatAIClient {
                                 "\n" +
                                 "Consideraciones para formateo de la respuesta:\n" +
                                 "1. Divide cada oración de la respuesta con el código \"?LL?\". Por ejemplo: 'Hola, ¿en qué puedo ayudarte? ?LL? Necesito más información sobre tu consulta.'\n" +
-                                "2. *No modifiques los saltos de línea en listas o bloques que ya contengan separaciones claras.* Por ejemplo:\n" +
+                                "2. No modifiques los saltos de línea en listas o bloques que ya contengan separaciones claras. Por ejemplo:\n" +
                                 "   - Lista uno\n" +
                                 "   - Lista dos\n" +
                                 "3. Asegúrate de que las respuestas sean fáciles de procesar y mantengan el contexto conversacional.\n" +
