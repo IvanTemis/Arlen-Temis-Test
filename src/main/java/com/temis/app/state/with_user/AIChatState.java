@@ -89,7 +89,7 @@ protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEnti
                 "\n" +
                         "Contexto de la conversación:\n" +
                         "\n" +
-                        " - Usuario: El usuario se llama \"" + name + "\".\n" +
+                        " - Nombre del usuario: " + name + ".\n" +
                         " - Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
                         " - Fecha y Hora de la última interacción: " + (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n"
         );
