@@ -1,7 +1,7 @@
 package com.temis.app.config;
 
 import com.temis.app.client.ChatAIClient;
-//import com.temis.app.client.CloudStorageClient;
+import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.VertexAIClient;
 
 import java.io.IOException;
@@ -39,4 +39,11 @@ public class CloudConfig {
         );
     }
 
+    @Bean
+    public CloudStorageClient cloudStorageClient() {
+        return new CloudStorageClient(
+                cloudConfigProperties.getProjectId(),
+                cloudConfigProperties.getStorage().getBucketName()
+        );
+    }
 }

@@ -39,6 +39,7 @@ public class MessageContextEntity {
     String body;
 
     @Nullable
+    @Setter
     @Column(nullable = true, columnDefinition = "TEXT")
     String mediaUrl;
 

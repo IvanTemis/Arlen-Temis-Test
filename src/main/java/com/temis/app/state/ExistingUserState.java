@@ -6,6 +6,7 @@ import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.repository.UserRepository;
 import com.temis.app.state.with_user.AIChatState;
 import com.temis.app.state.with_user.BeginDocumentCreationState;
+import com.temis.app.state.with_user.ProcessFileIntransitableState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +21,9 @@ public class ExistingUserState extends StateTemplate{
     private MessageContextRepository messageContextRepository;
 
     @Autowired
-    public ExistingUserState(AIChatState aiChatState) {
+    public ExistingUserState(ProcessFileIntransitableState processFileIntransitableState, AIChatState aiChatState) {
         super(new ArrayList<>(){{
+            add(processFileIntransitableState);
             add(aiChatState);
         }});
     }

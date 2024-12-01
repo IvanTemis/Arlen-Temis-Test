@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -19,8 +20,9 @@ public class DocumentEntity {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @JoinColumn(name = "document_type_id", nullable = false)
-    @ManyToOne(optional = false, targetEntity = DocumentTypeEntity.class)
+    @Nullable
+    @JoinColumn(name = "document_type_id", nullable = true)
+    @ManyToOne(optional = true, targetEntity = DocumentTypeEntity.class)
     private DocumentTypeEntity documentType;
 
     @Setter
@@ -31,6 +33,9 @@ public class DocumentEntity {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    private String fileType;
 
     @Column(nullable = true)
     private Timestamp issueDate;
@@ -49,13 +54,11 @@ public class DocumentEntity {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Timestamp receptionDate;
+    private Date receptionDate;
 
     @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-    private Timestamp lastModifiedDate;
+    private Date lastModifiedDate;
 
     @ManyToMany(mappedBy = "generationInput")
     Set<NotaryDocumentEntity> generationOutput;

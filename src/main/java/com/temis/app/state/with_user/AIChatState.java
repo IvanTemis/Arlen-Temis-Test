@@ -1,6 +1,7 @@
 package com.temis.app.state.with_user;
 
 import com.google.cloud.vertexai.api.Content;
+import com.google.cloud.vertexai.api.FileData;
 import com.google.cloud.vertexai.api.Part;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -44,10 +45,29 @@ public class AIChatState extends  StateWithUserTemplate{
 
     @Override
 protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
+        var partBuilder = Part.newBuilder();
 
-        if (message.getBody().isEmpty()) {
+        if(!message.getBody().isEmpty()){
+            partBuilder.setText(message.getBody());
+        }
+        else if (message.getMediaUrl() == null) {
             responseBuilder.body("Lo siento, no puedo procesar mensajes que no sean texto.");
             return;
+        }
+        else{
+            partBuilder.setText("documento:");
+        }
+
+        var contentBuilder = Content.newBuilder()
+                .setRole(VertexAiRole.USER.name())
+                .addParts(partBuilder);
+
+        if(message.getMediaUrl() != null && message.getMediaContentType() != null){
+            contentBuilder.addParts(Part.newBuilder().setFileData(
+                    FileData.newBuilder()
+                            .setMimeType(message.getMediaContentType())
+                            .setFileUri(message.getMediaUrl())
+            ));
         }
 
         var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
@@ -68,10 +88,7 @@ protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEnti
             history.add(c);
         }
 
-        var content = Content.newBuilder()
-                .setRole(VertexAiRole.USER.name())
-                .addParts(Part.newBuilder().setText(message.getBody()).build())
-                .build();
+        var content = contentBuilder.build();
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
 

@@ -27,7 +27,7 @@ public abstract class StateTemplate {
         log.debug("Pre-Evaluating state.");
     }
 
-    public MessageResponseEntity Evaluate(MessageContextEntity message){
+    public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
         PreEvaluate(message);
         log.info("Evaluating State for Message with Id: {}", message.getId());
         log.debug("Processing {} possible transitions.", _otherStates.size());
@@ -74,7 +74,7 @@ public abstract class StateTemplate {
     }
 
     //La información del MessageHolderObject puede ser modificada durante esta etapa para futuro uso en otros estados
-    protected abstract boolean ShouldTransition(MessageContextEntity message);
+    protected abstract boolean ShouldTransition(MessageContextEntity message) throws Exception;
 
     protected abstract void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) throws Exception;
 }

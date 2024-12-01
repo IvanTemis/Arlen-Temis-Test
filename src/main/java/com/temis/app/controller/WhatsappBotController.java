@@ -52,7 +52,7 @@ public class WhatsappBotController {
     }
 
     @PostMapping("/webhook")
-    public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws IOException, TwiMLException, InterruptedException {
+    public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) throws Exception {
         String userMessage = requestBody.get("Body");
         String phoneNumber = requestBody.get("From");
         String nickName = requestBody.get("ProfileName");
