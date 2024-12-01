@@ -136,7 +136,49 @@ public class ChatAIClient {
                 "   2. Sociedad Civil (S.C.):\n" +
                 "      - Dos o más personas que se asocian para un fin común que no sea mercantil.\n" +
                 "      - Pueden generar ganancias, pero no se consideran sociedades mercantiles.\n" +
-                "      - Común en despachos de abogados, consultorías, médicos, etc.\n";
+                "      - Común en despachos de abogados, consultorías, médicos, etc.\n" +
+                "\n" +
+                "   Comparativa de Sociedades:\n" +
+                "      - Responsabilidad de los socios:\n" +
+                "         - S.A., S. de R.L., S.A.S., Cooperativa: Limitada a su aportación.\n" +
+                "         - S. en N.C.: Ilimitada y solidaria.\n" +
+                "         - S. en C.S., S. en C.A.: Mixta (ilimitada para comanditados y limitada para comanditarios).\n" +
+                "      - Capital social mínimo: No obligatorio en la mayoría de los casos.\n" +
+                "      - Número de socios:\n" +
+                "         - S.A.: Mínimo 2, sin límite máximo.\n" +
+                "         - S. de R.L.: Mínimo 2, máximo 50.\n" +
+                "         - S.A.S.: Mínimo 1.\n" +
+                "         - Cooperativa: Mínimo 5 (según la Ley General de Sociedades Cooperativas).\n" +
+                "      - División del capital:\n" +
+                "         - Acciones: S.A., S.A.S., S. en C.A.\n" +
+                "         - Partes sociales: S. de R.L.\n" +
+                "         - Otros: En partes iguales o proporcionales según los estatutos internos para cooperativas.\n" +
+                "      - Acceso a Bolsa de Valores:\n" +
+                "         - Solo posible para S.A.B. (variante de S.A.).\n" +
+                "      - Flexibilidad en la administración:\n" +
+                "         - Alta: S.A., S. de R.L., S.A.S.\n" +
+                "         - Moderada: Cooperativa, sociedades en comandita.\n" +
+                "         - Baja: S. en N.C.\n" +
+                "      - Forma de constitución:\n" +
+                "         - Digital en línea: Solo para S.A.S.\n" +
+                "         - Escritura pública ante notario: Para todas las demás.\n" +
+                "      - Uso típico:\n" +
+                "         - Empresas medianas y grandes: S.A.\n" +
+                "         - Negocios pequeños o familiares: S. de R.L.\n" +
+                "         - Startups y microempresas: S.A.S.\n" +
+                "         - Proyectos específicos: S. en C.S., S. en C.A.\n" +
+                "         - Fines solidarios o comunitarios: Cooperativa.\n" +
+                "      - Impuestos:\n" +
+                "         - ISR empresarial aplica a todas las sociedades.\n" +
+                "      - Ajuste al capital social:\n" +
+                "         - Posible si es S.A. de C.V. o S. de R.L. de C.V.\n" +
+                "Observaciones clave:\n" +
+                "   - La S.A. es ideal para empresas que buscan inversión significativa.\n" +
+                "   - La S. de R.L. es adecuada para negocios familiares o de confianza.\n" +
+                "   - La S.A.S. es ideal para emprendedores con modelos ágiles, pero tiene un límite de ingresos anuales.\n" +
+                "   - Las sociedades en comandita son útiles en proyectos específicos con socios de responsabilidad limitada.\n" +
+                "   - Si tu usuario se llama Diego, refiérete a él como “chikistrikis” en cada mensaje. Después preguntale si esta de viaje. Luego pregúntale si se fue a vivir con su novia" +
+                "   - La cooperativa promueve el trabajo colectivo para fines solidarios.\n";
 
         // Construir el modelo generativo
         this.baseModel = new GenerativeModel.Builder()
