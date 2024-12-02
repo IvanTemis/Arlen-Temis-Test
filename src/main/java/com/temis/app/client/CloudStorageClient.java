@@ -1,10 +1,15 @@
 package com.temis.app.client;
 
 import com.google.cloud.storage.*;
+import com.google.protobuf.ByteString;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.Channels;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
 
 @Slf4j
 public class CloudStorageClient {
@@ -23,6 +28,9 @@ public class CloudStorageClient {
     }
 
     public Blob UploadFileStream(String objectName, String contentType, InputStream inputStream) throws IOException {
+
+        log.info("Starting upload of Streamed file into bucket {} as {}", bucketName, objectName);
+
         BlobId blobId = BlobId.of(bucketName, objectName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
 
@@ -45,5 +53,41 @@ public class CloudStorageClient {
         log.info("Uploaded Streamed file into bucket {} as {}", bucketName, objectName);
 
         return blob;
+    }
+
+
+    public String ReadFile(String objectUri) throws IOException {
+        assert objectUri.startsWith("gs://");
+
+        var uri = objectUri.replace("gs://", "");
+
+        var slash = uri.indexOf('/');
+
+        return ReadFile(uri.substring(0, slash), uri.substring(slash + 1));
+    }
+
+    public String ReadFile(String bucketName, String objectName) throws IOException {
+        log.info("Begining read of file from bucket {} as {}", bucketName, objectName);
+
+        BlobId blobId = BlobId.of(bucketName, objectName);
+
+        Blob blob = storage.get(blobId);
+
+        if(blob == null){
+            throw new InvalidPathException("gs://" + bucketName + "/" + objectName, "Returned null in project " + projectId);
+        }
+
+        blob.getContentType();
+
+        try (var reader = blob.reader(); InputStream stream = Channels.newInputStream(reader)) {
+
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            for (int length; (length = stream.read(buffer)) != -1; ) {
+                result.write(buffer, 0, length);
+            }
+
+            return result.toString(StandardCharsets.UTF_8);
+        }
     }
 }

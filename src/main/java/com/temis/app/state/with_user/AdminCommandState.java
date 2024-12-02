@@ -1,5 +1,6 @@
 package com.temis.app.state.with_user;
 
+import com.temis.app.client.ChatAIClient;
 import com.temis.app.entity.*;
 import com.temis.app.model.RequirementType;
 import com.temis.app.repository.RequirementRepository;
@@ -8,6 +9,7 @@ import com.temis.app.repository.VertexAiContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -20,6 +22,9 @@ public class AdminCommandState extends  StateWithUserTemplate{
     VertexAiContentRepository vertexAiContextRepository;
 
     @Autowired
+    ChatAIClient chatAIClient;
+
+    @Autowired
     public AdminCommandState() {
         super(new ArrayList<>());
     }
@@ -30,7 +35,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
     }
 
     @Override
-    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws URISyntaxException {
+    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
 
         var split = message.getBody().toLowerCase().split(" ");
 
@@ -46,6 +51,14 @@ public class AdminCommandState extends  StateWithUserTemplate{
                 vertexAiContextRepository.deleteAll(history);
 
                 responseBuilder.body("Contexto historico del agente limpiado.");
+            }
+            break;
+            case "!fetchprompt":
+            case "!updateprompt":
+            case "!refreshprompt":
+            {
+                chatAIClient.UpdatePrompt();
+                responseBuilder.body("Prompt actualizado exitosamente.");
             }
             break;
             default:
