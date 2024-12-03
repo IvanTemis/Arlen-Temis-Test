@@ -11,7 +11,7 @@ ENV HOST 0.0.0.0
 COPY target/app-0.0.1-SNAPSHOT.jar app.jar
 
 # Copia el archivo secrets.properties al contenedor
-COPY secrets.properties /app/secrets.properties
+#COPY secrets.properties /app/secrets.properties
 
 # Expone el puerto en el que correrá la aplicación (por defecto es 8080 en Spring Boot)
 EXPOSE 8080

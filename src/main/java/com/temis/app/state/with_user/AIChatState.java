@@ -105,10 +105,9 @@ protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEnti
         var response = chatAIClient.sendMessage(content, history,
                 "\n" +
                         "Contexto de la conversación:\n" +
-                        "\n" +
-                        " - Nombre del usuario: " + name + ".\n" +
-                        " - Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
-                        " - Fecha y Hora de la última interacción: " + (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n"
+                        "\t- Nombre del usuario: " + name + ".\n" +
+                        "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
+                        "\t- Fecha y Hora de la última interacción: " + (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n"
         );
 
         String rawResponse = ResponseHandler.getText(response);
