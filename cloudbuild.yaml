@@ -5,49 +5,49 @@ steps:
       - '-c'
       - >
         echo "google.cloud.credentials.path=$(gcloud secrets versions access
-        latest --secret=google_cloud_credentials_path)" >> application.properties
+        latest --secret=google_cloud_credentials_path)" >> secrets.properties
 
         echo "spring.datasource.url=$(gcloud secrets versions access latest
-        --secret=spring_datasource_url)" >> application.properties
+        --secret=spring_datasource_url)" >> secrets.properties
 
         echo "spring.datasource.username=$(gcloud secrets versions access latest
-        --secret=spring_datasource_username)" >> application.properties
+        --secret=spring_datasource_username)" >> secrets.properties
 
         echo "spring.datasource.password=$(gcloud secrets versions access latest
-        --secret=spring_datasource_password)" >> application.properties
+        --secret=spring_datasource_password)" >> secrets.properties
 
         echo "whatsappapi.token=$(gcloud secrets versions access latest
-        --secret=whatsappapi_token)" >> application.properties
+        --secret=whatsappapi_token)" >> secrets.properties
 
         echo "whatsappapi.apiVersion=$(gcloud secrets versions access latest
-        --secret=whatsappapi_apiVersion)" >> application.properties
+        --secret=whatsappapi_apiVersion)" >> secrets.properties
 
         echo "whatsappapi.phoneNumberId=$(gcloud secrets versions access latest
-        --secret=whatsappapi_phoneNumberId)" >> application.properties
+        --secret=whatsappapi_phoneNumberId)" >> secrets.properties
 
         echo "whatsappapi.businessAccountId=$(gcloud secrets versions access
-        latest --secret=whatsappapi_businessAccountId)" >> application.properties
+        latest --secret=whatsappapi_businessAccountId)" >> secrets.properties
 
         echo "twilio.accountSid=$(gcloud secrets versions access latest
-        --secret=twilio_accountSid)" >> application.properties
+        --secret=twilio_accountSid)" >> secrets.properties
 
         echo "twilio.authToken=$(gcloud secrets versions access latest
-        --secret=twilio_authToken)" >> application.properties
+        --secret=twilio_authToken)" >> secrets.properties
 
         echo "twilio.phoneNumber=$(gcloud secrets versions access latest
-        --secret=twilio_phoneNumber)" >> application.properties
+        --secret=twilio_phoneNumber)" >> secrets.properties
 
         echo "cloud.projectId=$(gcloud secrets versions access latest
-        --secret=cloud_projectId)" >> application.properties
+        --secret=cloud_projectId)" >> secrets.properties
 
         echo "cloud.location=$(gcloud secrets versions access latest
-        --secret=cloud_location)" >> application.properties
+        --secret=cloud_location)" >> secrets.properties
 
         echo "cloud.vertexai.modelName=$(gcloud secrets versions access latest
-        --secret=cloud_vertexai_modelName)" >> application.properties
+        --secret=cloud_vertexai_modelName)" >> secrets.properties
 
         echo "cloud.storage.bucketName=$(gcloud secrets versions access latest
-        --secret=cloud_storage_bucketName)" >> application.properties
+        --secret=cloud_storage_bucketName)" >> secrets.properties
     entrypoint: bash
   - name: 'maven:3.9.9-amazoncorretto-17-al2023'
     args:
