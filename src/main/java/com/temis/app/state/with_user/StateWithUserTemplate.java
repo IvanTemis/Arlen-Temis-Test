@@ -13,13 +13,13 @@ public abstract class StateWithUserTemplate extends StateTemplate {
     }
 
     @Override
-    protected boolean ShouldTransition(MessageContextEntity message) {
+    protected boolean ShouldTransition(MessageContextEntity message) throws Exception {
         assert message.getUserEntity() != null;
 
         return ShouldTransitionWithUser(message, message.getUserEntity());
     }
 
-    protected abstract boolean ShouldTransitionWithUser(MessageContextEntity message, UserEntity user);
+    protected abstract boolean ShouldTransitionWithUser(MessageContextEntity message, UserEntity user) throws Exception;
 
     @Override
     protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) throws Exception {
