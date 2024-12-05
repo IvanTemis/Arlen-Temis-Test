@@ -1,0 +1,109 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    id: Secrets
+    args:
+      - '-c'
+      - >
+        echo "google.cloud.credentials.path=$(gcloud secrets versions access
+        latest --secret=google_cloud_credentials_path)" >> secrets.properties
+
+        echo "spring.datasource.url=$(gcloud secrets versions access latest
+        --secret=spring_datasource_url)" >> secrets.properties
+
+        echo "spring.datasource.username=$(gcloud secrets versions access latest
+        --secret=spring_datasource_username)" >> secrets.properties
+
+        echo "spring.datasource.password=$(gcloud secrets versions access latest
+        --secret=spring_datasource_password)" >> secrets.properties
+
+        echo "whatsappapi.token=$(gcloud secrets versions access latest
+        --secret=whatsappapi_token)" >> secrets.properties
+
+        echo "whatsappapi.apiVersion=$(gcloud secrets versions access latest
+        --secret=whatsappapi_apiVersion)" >> secrets.properties
+
+        echo "whatsappapi.phoneNumberId=$(gcloud secrets versions access latest
+        --secret=whatsappapi_phoneNumberId)" >> secrets.properties
+
+        echo "whatsappapi.businessAccountId=$(gcloud secrets versions access
+        latest --secret=whatsappapi_businessAccountId)" >> secrets.properties
+
+        echo "twilio.accountSid=$(gcloud secrets versions access latest
+        --secret=twilio_accountSid)" >> secrets.properties
+
+        echo "twilio.authToken=$(gcloud secrets versions access latest
+        --secret=twilio_authToken)" >> secrets.properties
+
+        echo "twilio.phoneNumber=$(gcloud secrets versions access latest
+        --secret=twilio_phoneNumber)" >> secrets.properties
+
+        echo "cloud.projectId=$(gcloud secrets versions access latest
+        --secret=cloud_projectId)" >> secrets.properties
+
+        echo "cloud.location=$(gcloud secrets versions access latest
+        --secret=cloud_location)" >> secrets.properties
+
+        echo "cloud.vertexai.modelName=$(gcloud secrets versions access latest
+        --secret=cloud_vertexai_modelName)" >> secrets.properties
+
+        echo "cloud.storage.bucketName=$(gcloud secrets versions access latest
+        --secret=cloud_storage_bucketName)" >> secrets.properties
+    entrypoint: bash
+  - name: 'maven:3.9.9-amazoncorretto-17-al2023'
+    args:
+      - clean
+      - package
+      - '-Dmaven.test.skip=true'
+      - '-Dspring.config.import=file:secrets.properties'
+    id: Maven
+    entrypoint: mvn
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - .
+      - '-f'
+      - Dockerfile
+    dir: .
+    id: Build
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - >-
+        --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+    id: Deploy
+    entrypoint: gcloud
+images:
+  - >-
+    $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _PLATFORM: managed
+  _SERVICE_NAME: temis
+  _TRIGGER_ID: eac75049-a790-4eaf-a426-886634cd8fba
+  REPO_NAME: arlen-temis-test
+  _DEPLOY_REGION: us-central1
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - temis

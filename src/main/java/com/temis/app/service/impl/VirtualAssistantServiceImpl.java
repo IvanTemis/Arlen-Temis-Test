@@ -4,12 +4,17 @@ import com.temis.app.config.properties.WhatsappApiConfigProperties;
 import com.whatsapp.api.domain.messages.Message;
 import com.whatsapp.api.domain.messages.TextMessage;
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi;
+import com.temis.app.config.properties.TwilioConfigProperties;
+import com.twilio.Twilio;
+import com.twilio.converter.Promoter;
+import com.twilio.rest.api.v2010.account.Message;
+import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.temis.app.service.VirtualAssistantService;
 
-@Service
+@Service @Deprecated
 public class VirtualAssistantServiceImpl implements VirtualAssistantService {
 
     @Autowired

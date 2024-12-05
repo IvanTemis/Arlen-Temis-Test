@@ -1,13 +1,8 @@
 package com.temis.app.client;
 
 import com.google.cloud.vertexai.VertexAI;
-import com.google.cloud.vertexai.api.GenerateContentResponse;
-import com.google.cloud.vertexai.api.GenerationConfig;
-import com.google.cloud.vertexai.api.HarmCategory;
-import com.google.cloud.vertexai.api.SafetySetting;
-import com.google.cloud.vertexai.generativeai.ContentMaker;
-import com.google.cloud.vertexai.generativeai.GenerativeModel;
-import com.google.cloud.vertexai.generativeai.ResponseStream;
+import com.google.cloud.vertexai.api.*;
+import com.google.cloud.vertexai.generativeai.*;
 
 import java.io.IOException;
 import java.util.Arrays;
