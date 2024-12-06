@@ -29,6 +29,9 @@ public class MessageContextEntity {
     @Column(unique = true, nullable = false)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String messageId;
+
     @Column(nullable = false)
     String phoneNumber;
 
@@ -53,7 +56,7 @@ public class MessageContextEntity {
 
     @Column(nullable = false, columnDefinition = "text")
     @Convert(converter = JsonConverter.class)
-    Map<String, String> request;
+    Map<String, Object> request;
 
     @Setter
     @Nullable

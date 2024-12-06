@@ -1,6 +1,7 @@
 package com.temis.app.controller;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,17 +57,19 @@ public class WhatsappBotController {
         String userMessage = requestBody.get("Body");
         String phoneNumber = requestBody.get("From");
         String nickName = requestBody.get("ProfileName");
+        String SmsMessageSid = requestBody.get("SmsMessageSid");
 
-        log.info("WhatsappBotController: {}", requestBody);
+        log.info("WhatsappBotController twilio: {}", requestBody);
 
         Twilio.init(twilioConfigProperties.accountSid(), twilioConfigProperties.authToken());
 
         var messageContextBuilder = MessageContextEntity.builder()
+                .messageId("twilio:" + SmsMessageSid)
                 .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                 .nickName(nickName)
                 .body(userMessage)
                 .messageSource(MessageSource.TWILIO)
-                .request(requestBody);
+                .request(new HashMap<>(requestBody));
 
 
         if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
@@ -77,18 +80,19 @@ public class WhatsappBotController {
 
         var response = firstContactState.Evaluate(messageContextBuilder.build());
 
-        log.info("Response Generated: {}", new Gson().toJson(response));
+        log.info("Response Generated twilio: {}", new Gson().toJson(response));
 
         List<String> sentences = TextUtils.splitIntoSentences(response.getBody());
 
-        for (String sentence : sentences) {
+        for (int i = 0; i < sentences.size(); i++)  {
+            var sentence = sentences.get(i);
+
             var message = Message.creator(
                     new PhoneNumber("whatsapp:" + response.getPhoneNumber()),
                     new PhoneNumber(twilioConfigProperties.phoneNumber()),
                     sentence
             );
-
-            if (response.getMediaURL() != null) {
+            if (response.getMediaURL() != null && i == 0) {
                 message.setMediaUrl(response.getMediaURL());
             }
 
