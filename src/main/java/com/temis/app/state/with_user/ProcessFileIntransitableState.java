@@ -1,6 +1,7 @@
 package com.temis.app.state.with_user;
 
 import com.temis.app.config.properties.TwilioConfigProperties;
+import com.temis.app.config.properties.WhatsappApiConfigProperties;
 import com.temis.app.entity.DocumentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.UserEntity;
@@ -30,6 +31,8 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
     @Autowired
     private TwilioConfigProperties twilioConfigProperties;
     @Autowired
+    private WhatsappApiConfigProperties whatsappApiConfigProperties;
+    @Autowired
     private FileStorageService fileStorageService;
 
     @Override
@@ -51,7 +54,9 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
                     headers.add("Authorization", "Basic " + authEncoded);
 
                 }
-                case META -> throw new UnsupportedOperationException();
+                case META -> {
+                    headers.add("Authorization", "Bearer " + whatsappApiConfigProperties.token());
+                }
                 default -> throw new UnsupportedOperationException();
             }
 

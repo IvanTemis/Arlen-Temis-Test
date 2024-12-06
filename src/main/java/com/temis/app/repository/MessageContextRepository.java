@@ -10,4 +10,5 @@ import java.util.List;
 
 @Repository
 public interface MessageContextRepository extends CrudRepository<MessageContextEntity, Long> {
+    List<MessageContextEntity> findByMessageId(String messageId);
 }
