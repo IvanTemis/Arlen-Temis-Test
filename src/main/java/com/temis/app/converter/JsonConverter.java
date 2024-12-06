@@ -13,14 +13,14 @@ import java.util.Map;
 
 @Converter
 @Slf4j
-public class JsonConverter implements AttributeConverter<Map<String, String>, String> {
+public class JsonConverter implements AttributeConverter<Map<String, Object>, String> {
 
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    private final TypeReference<Map<String, String>> mapTypeRef = new TypeReference<Map<String, String>>() {
+    private final TypeReference<Map<String, Object>> mapTypeRef = new TypeReference<Map<String, Object>>() {
     };
 
     @Override
-    public String convertToDatabaseColumn(Map<String, String> data) {
+    public String convertToDatabaseColumn(Map<String, Object> data) {
 
         if (null == data) {
             return null;
@@ -35,7 +35,7 @@ public class JsonConverter implements AttributeConverter<Map<String, String>, St
     }
 
     @Override
-    public Map<String, String> convertToEntityAttribute(String dbData) {
+    public Map<String, Object> convertToEntityAttribute(String dbData) {
 
         if (null == dbData || dbData.isEmpty()) {
             return Collections.emptyMap();
