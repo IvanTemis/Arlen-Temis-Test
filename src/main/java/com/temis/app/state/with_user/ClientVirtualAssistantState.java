@@ -5,7 +5,6 @@ import com.google.cloud.vertexai.api.FileData;
 import com.google.cloud.vertexai.api.Part;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.type.DateTime;
 import com.temis.app.client.ChatAIClient;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
@@ -30,8 +29,6 @@ public class AIChatState extends  StateWithUserTemplate{
 
     @Autowired
     VertexAiContentRepository vertexAiContextRepository;
-    @Autowired
-    UserRepository userRepository;
 
     @Autowired
     public AIChatState() {
@@ -116,8 +113,5 @@ protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEnti
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response)));
 
         responseBuilder.body(rawResponse);
-
-        user.setLastInteractionDate(new Date());
-        userRepository.save(user);
     }
 }

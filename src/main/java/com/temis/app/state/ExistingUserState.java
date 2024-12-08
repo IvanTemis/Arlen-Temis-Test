@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Component
 public class ExistingUserState extends StateTemplate{
@@ -58,5 +59,16 @@ public class ExistingUserState extends StateTemplate{
         responseBuilder.quickActions(new ArrayList<>(){{
             add(BeginDocumentCreationState.compraventa);
         }});
+    }
+
+    @Override
+    public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
+        var result = super.Evaluate(message);
+        var user = message.getUserEntity();
+        if(user != null) {
+            user.setLastInteractionDate(new Date());
+            userRepository.save(user);
+        }
+        return result;
     }
 }
