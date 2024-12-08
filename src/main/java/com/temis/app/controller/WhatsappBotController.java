@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.temis.app.model.DocumentSummarizeDTO;
 import com.temis.app.service.SummarizeService;
-import com.temis.app.service.VirtualAssistantService;
-import com.twilio.twiml.TwiMLException;
+import com.temis.app.service.ClientVirtualAssistantService;
 
 @RestController
 @RequestMapping("/whatsapp-bot")
@@ -31,9 +30,6 @@ public class WhatsappBotController {
 
     @Autowired
     private SummarizeService summarizeService;
-
-    @Autowired
-    private VirtualAssistantService virtualAssistantService;
 
     @Autowired
     private FirstContactState firstContactState;

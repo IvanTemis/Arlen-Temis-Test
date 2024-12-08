@@ -4,7 +4,7 @@ import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.repository.UserRepository;
-import com.temis.app.state.with_user.AIChatState;
+import com.temis.app.state.with_user.ClientVirtualAssistantState;
 import com.temis.app.state.with_user.AdminCommandState;
 import com.temis.app.state.with_user.BeginDocumentCreationState;
 import com.temis.app.state.with_user.ProcessFileIntransitableState;
@@ -23,11 +23,11 @@ public class ExistingUserState extends StateTemplate{
     private MessageContextRepository messageContextRepository;
 
     @Autowired
-    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, AIChatState aiChatState) {
+    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ClientVirtualAssistantState clientVirtualAssistantState) {
         super(new ArrayList<>(){{
             add(adminCommandState);
             add(processFileIntransitableState);
-            add(aiChatState);
+            add(clientVirtualAssistantState);
         }});
     }
 
