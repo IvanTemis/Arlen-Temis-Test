@@ -42,7 +42,6 @@ public class MessageContextEntity {
     String body;
 
     @Nullable
-    @Setter
     @Column(nullable = true, columnDefinition = "TEXT")
     String mediaUrl;
 
@@ -57,6 +56,12 @@ public class MessageContextEntity {
     @Column(nullable = false, columnDefinition = "text")
     @Convert(converter = JsonConverter.class)
     Map<String, Object> request;
+
+    @Setter
+    @Nullable
+    @JoinColumn(nullable = true, name = "document_id")
+    @ManyToOne(optional = true, targetEntity = DocumentEntity.class)
+    DocumentEntity documentEntity;
 
     @Setter
     @Nullable

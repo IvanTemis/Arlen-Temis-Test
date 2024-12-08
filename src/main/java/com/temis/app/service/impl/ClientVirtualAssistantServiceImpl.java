@@ -6,10 +6,7 @@ import com.google.cloud.vertexai.api.Part;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.temis.app.client.ChatAIClient;
-import com.temis.app.entity.MessageContextEntity;
-import com.temis.app.entity.MessageResponseEntity;
-import com.temis.app.entity.UserEntity;
-import com.temis.app.entity.VertexAiContentEntity;
+import com.temis.app.entity.*;
 import com.temis.app.model.VertexAiRole;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.utils.VertexAIUtils;
@@ -30,36 +27,12 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
 
     @Override
-    public String respondToUserMessage(MessageContextEntity message, UserEntity user) throws IOException {
-        var partBuilder = Part.newBuilder();
-
-        if(!message.getBody().isEmpty()){
-            partBuilder.setText(message.getBody());
-        }
-        else if (message.getMediaUrl() == null) {
-            return "Lo siento, no puedo procesar mensajes vacíos.";
-        }
-        else{
-            partBuilder.setText("documento:");
-        }
-
-        var contentBuilder = Content.newBuilder()
-                .setRole(VertexAiRole.USER.name())
-                .addParts(partBuilder);
-
-        if(message.getMediaUrl() != null && message.getMediaContentType() != null){
-            contentBuilder.addParts(Part.newBuilder().setFileData(
-                    FileData.newBuilder()
-                            .setMimeType(message.getMediaContentType())
-                            .setFileUri(message.getMediaUrl())
-            ));
-        }
+    public String respondToUserMessage(String text, DocumentEntity document, UserEntity user) throws IOException {
+        Content content = VertexAIUtils.ContentWithDocument(text, document.getPath(), document.getFileType());
 
         var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
         var history = VertexAIUtils.VertexAiContentEntityToContent(contexts);
-
-        var content = contentBuilder.build();
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content));
 

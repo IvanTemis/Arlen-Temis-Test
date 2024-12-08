@@ -85,15 +85,4 @@ public class ChatAIClient {
 
         return chatSession.sendMessage(message);
     }
-
-    public String filterResponse(String response) {
-        // Limita las respuestas a un máximo de 4 oraciones
-        String[] sentences = response.split("\\n");
-        int maxSentences = Math.min(sentences.length, 4);
-        StringBuilder filteredResponse = new StringBuilder();
-        for (int i = 0; i < maxSentences; i++) {
-            filteredResponse.append(sentences[i].trim()); //.append(". ")
-        }
-        return filteredResponse.toString().trim();
-    }
 }

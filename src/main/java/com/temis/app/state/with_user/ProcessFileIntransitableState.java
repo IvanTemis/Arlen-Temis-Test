@@ -81,7 +81,7 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
             }).block().close();
             //Es intencional que brinque el error aquí
             assert document.get() != null;
-            message.setMediaUrl(document.get().getPath());
+            message.setDocumentEntity(document.get());
         }
     }
 }

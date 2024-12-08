@@ -40,6 +40,16 @@ public class ClientVirtualAssistantState extends  StateWithUserTemplate{
 
     @Override
     protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
-        responseBuilder.body(clientVirtualAssistantService.respondToUserMessage(message, user));
+        if (message.getMediaUrl() == null && message.getBody().isEmpty()) {
+            responseBuilder.body("Lo siento, no puedo procesar mensajes vacíos.");
+            return;
+        }
+
+        String text = message.getBody();
+        if(text == null || text.isEmpty()){
+            text = "documento:";
+        }
+
+        responseBuilder.body(clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user));
     }
 }
