@@ -6,6 +6,7 @@ import com.temis.app.model.RequirementType;
 import com.temis.app.repository.RequirementRepository;
 import com.temis.app.repository.ServiceRepository;
 import com.temis.app.repository.VertexAiContentRepository;
+import com.temis.app.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +26,9 @@ public class AdminCommandState extends  StateWithUserTemplate{
     ChatAIClient chatAIClient;
 
     @Autowired
+    EmailService emailService;
+
+    @Autowired
     public AdminCommandState() {
         super(new ArrayList<>());
     }
@@ -39,7 +43,9 @@ public class AdminCommandState extends  StateWithUserTemplate{
 
         var split = message.getBody().toLowerCase().split(" ");
 
-        switch (split[0]){
+        var command = split[0];
+
+        switch (command){
             case "!lobotomía":
             case "!lobotomia":
             case "!clearhistory":
@@ -59,6 +65,20 @@ public class AdminCommandState extends  StateWithUserTemplate{
             {
                 chatAIClient.UpdatePrompt();
                 responseBuilder.body("Prompt actualizado exitosamente.");
+            }
+            break;
+            case "!emailtest":{
+
+                var email = user.getEmail();
+
+                if(email == null){
+                    responseBuilder.body("Disculpa, no puedo enviarte este correo porque no tienes un correo asignado.");
+                    break;
+                }
+
+                emailService.SendSimpleEmail(email, "TEST", message.getBody().substring(command.length() + 1));
+
+                responseBuilder.body("Email de prueba enviado a tu correo.");
             }
             break;
             default:
