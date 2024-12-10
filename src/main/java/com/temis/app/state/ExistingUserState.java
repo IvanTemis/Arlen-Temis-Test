@@ -25,8 +25,8 @@ public class ExistingUserState extends StateTemplate{
     @Autowired
     public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ClientVirtualAssistantState clientVirtualAssistantState) {
         super(new ArrayList<>(){{
-            add(adminCommandState);
             add(processFileIntransitableState);
+            add(adminCommandState);
             add(clientVirtualAssistantState);
         }});
     }

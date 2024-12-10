@@ -1,20 +1,18 @@
 package com.temis.app.state.with_user;
 
 import com.temis.app.client.ChatAIClient;
+import com.temis.app.client.CloudStorageClient;
 import com.temis.app.entity.*;
-import com.temis.app.model.RequirementType;
-import com.temis.app.repository.RequirementRepository;
-import com.temis.app.repository.ServiceRepository;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.service.EmailService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class AdminCommandState extends  StateWithUserTemplate{
@@ -29,6 +27,9 @@ public class AdminCommandState extends  StateWithUserTemplate{
     EmailService emailService;
 
     @Autowired
+    private CloudStorageClient cloudStorageClient;
+
+    @Autowired
     public AdminCommandState() {
         super(new ArrayList<>());
     }
@@ -39,7 +40,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
     }
 
     @Override
-    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException {
+    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException, MessagingException {
 
         var split = message.getBody().toLowerCase().split(" ");
 
@@ -76,7 +77,16 @@ public class AdminCommandState extends  StateWithUserTemplate{
                     break;
                 }
 
-                emailService.SendSimpleEmail(email, "TEST", message.getBody().substring(command.length() + 1));
+                var body = message.getBody().substring(command.length() + 1);
+                var document = message.getDocumentEntity();
+                if(document != null){
+                    var bytes = cloudStorageClient.ReadFileBytes(document.getPath());
+
+                    emailService.SendHtmlEmailWithAttachments(email, "TEST", body, Pair.of(document.getName(), new ByteArrayResource(bytes)));
+                }
+                else{
+                    emailService.SendSimpleEmail(email, "TEST", body);
+                }
 
                 responseBuilder.body("Email de prueba enviado a tu correo.");
             }
