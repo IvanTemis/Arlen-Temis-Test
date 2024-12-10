@@ -4,6 +4,7 @@ import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.*;
 import com.google.cloud.vertexai.generativeai.*;
 import com.google.protobuf.ByteString;
+import com.temis.app.utils.VertexAIUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -76,13 +77,19 @@ public class ChatAIClient {
         this.vertexAi.close();
     }
 
-    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String context) throws IOException {
+    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String context) throws Exception {
         var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
 
         ChatSession chatSession = model.startChat();
 
         if(history != null) chatSession.setHistory(history);
 
-        return chatSession.sendMessage(message);
+        return VertexAIUtils.ExponentialBackoff(10,100,10000,() -> {
+            try {
+                return chatSession.sendMessage(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, log);
     }
 }

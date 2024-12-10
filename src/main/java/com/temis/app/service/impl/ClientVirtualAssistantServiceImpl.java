@@ -27,8 +27,14 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
 
     @Override
-    public String respondToUserMessage(String text, DocumentEntity document, UserEntity user) throws IOException {
-        Content content = VertexAIUtils.ContentWithDocument(text, document.getPath(), document.getFileType());
+    public String respondToUserMessage(String text, DocumentEntity document, UserEntity user) throws Exception {
+        Content content;
+        if(document != null){
+            content = VertexAIUtils.ContentWithDocument(text, document.getPath(), document.getFileType());
+        }
+        else {
+            content = VertexAIUtils.ContentWithDocument(text, null, null);
+        }
 
         var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 

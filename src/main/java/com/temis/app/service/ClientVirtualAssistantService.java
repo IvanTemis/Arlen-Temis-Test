@@ -7,5 +7,5 @@ import java.io.IOException;
 
 public interface ClientVirtualAssistantService {
 
-    String respondToUserMessage(String text, DocumentEntity document, UserEntity user) throws IOException;
+    String respondToUserMessage(String text, DocumentEntity document, UserEntity user) throws Exception;
 }

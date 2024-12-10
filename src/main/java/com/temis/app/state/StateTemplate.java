@@ -29,7 +29,7 @@ public abstract class StateTemplate {
 
     public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
         PreEvaluate(message);
-        log.info("Evaluating State for Message with Id: {}", message.getId());
+        log.info("Evaluating State {} for Message with Id: {}", this.getClass().getSimpleName(), message.getId());
         log.debug("Processing {} possible transitions.", _otherStates.size());
         for (var state : _otherStates){
             log.debug("Checking if should transition into {}.", state.getClass().getSimpleName());
@@ -43,7 +43,7 @@ public abstract class StateTemplate {
                 .phoneNumber(message.getPhoneNumber())
                 .userEntity(message.getUserEntity());
 
-        log.info("Executing State for Message with Id: {}", message.getId());
+        log.info("Executing State {} for Message with Id: {}", this.getClass().getSimpleName(), message.getId());
 
         Exception exception = null;
         String exceptionMessage = "The cake is a lie.";
