@@ -49,4 +49,8 @@ public class MessageResponseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdDate;
+
+    @Nullable
+    @Column(nullable = true, updatable = false, columnDefinition = "TEXT")
+    String exception;
 }
