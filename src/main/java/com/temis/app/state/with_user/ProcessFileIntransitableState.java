@@ -1,9 +1,13 @@
 package com.temis.app.state.with_user;
 
+import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.config.properties.TwilioConfigProperties;
 import com.temis.app.entity.DocumentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.UserEntity;
+import com.temis.app.repository.DocumentTypeRepository;
+import com.temis.app.repository.MessageContextRepository;
+import com.temis.app.service.DocumentClassificationService;
 import com.temis.app.service.FileStorageService;
 import org.apache.tika.mime.MimeTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +35,11 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
     private TwilioConfigProperties twilioConfigProperties;
     @Autowired
     private FileStorageService fileStorageService;
+    @Autowired
+    private DocumentClassificationService documentClassificationService;
 
     @Override
-    protected void Intransitable(MessageContextEntity message, UserEntity user) throws IOException {
+    protected void Intransitable(MessageContextEntity message, UserEntity user) throws Exception {
         if(message.getMediaUrl() != null){
             var mediaUrl = message.getMediaUrl();
             var mediaContentType = message.getMediaContentType();
@@ -69,10 +75,10 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
                     .map(DataBuffer::asInputStream)
                     .reduce(SequenceInputStream::new);
 
-            AtomicReference<DocumentEntity> document = new AtomicReference<>();
+            AtomicReference<DocumentEntity> atomicDocument = new AtomicReference<>();
             stream.doOnNext(inputStream -> {
                 try {
-                    document.set(fileStorageService.UploadDocumentStream(user, UUID.randomUUID().toString(), mediaContentType, inputStream));
+                    atomicDocument.set(fileStorageService.UploadDocumentStream(user, UUID.randomUUID().toString(), mediaContentType, inputStream));
 
                     inputStream.close();
                 } catch (IOException | MimeTypeException e) {
@@ -80,8 +86,11 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
                 }
             }).block().close();
             //Es intencional que brinque el error aquí
-            assert document.get() != null;
-            message.setDocumentEntity(document.get());
+            assert atomicDocument.get() != null;
+
+            var document = atomicDocument.get();
+
+            message.setDocumentEntity(documentClassificationService.ClassifyDocument(document));
         }
     }
 }
