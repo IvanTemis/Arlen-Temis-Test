@@ -47,7 +47,14 @@ public class ClientVirtualAssistantState extends  StateWithUserTemplate{
 
         String text = message.getBody();
         if(text == null || text.isEmpty()){
-            text = "documento:";
+            text = "documento";
+
+            if(message.getDocumentEntity() != null && message.getDocumentEntity().getDocumentType() != null){
+                text += " ";
+                text += message.getDocumentEntity().getDocumentType().getName();
+            }
+
+            text += ":";
         }
 
         responseBuilder.body(clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user));

@@ -60,12 +60,7 @@ public class VertexAIUtils {
         while (true){
             try{
                 if(retries >= maxRetries || cumulativeDelay > timeout){
-                    if(lastException != null){
-                        throw lastException;
-                    }
-                    else {
-                        throw new InterruptedException("Interrupted Backoff without an exception.");
-                    }
+                    break;
                 }
 
                 retries++;
@@ -84,9 +79,16 @@ public class VertexAIUtils {
 
                 cumulativeDelay += millisToWait;
 
-                log.info("Action failed, waiting for {} milliseconds", millisToWait);
+                log.info("Action failed, waiting for " +  millisToWait + " milliseconds", e);
                 Thread.sleep(millisToWait);
             }
+        }
+
+        if(lastException != null){
+            throw lastException;
+        }
+        else {
+            throw new InterruptedException("Interrupted Backoff without an exception.");
         }
     }
 }

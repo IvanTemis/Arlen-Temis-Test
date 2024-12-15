@@ -23,12 +23,7 @@ public abstract class StateTemplate {
         _otherStates = otherStates;
     }
 
-    protected void PreEvaluate(MessageContextEntity message) {
-        log.debug("Pre-Evaluating state.");
-    }
-
     public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
-        PreEvaluate(message);
         log.info("Evaluating State {} for Message with Id: {}", this.getClass().getSimpleName(), message.getId());
         log.debug("Processing {} possible transitions.", _otherStates.size());
         for (var state : _otherStates){

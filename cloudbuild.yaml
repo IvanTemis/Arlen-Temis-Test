@@ -48,6 +48,18 @@ steps:
 
         echo "cloud.storage.bucketName=$(gcloud secrets versions access latest
         --secret=cloud_storage_bucketName)" >> secrets.properties
+        
+        echo "spring.mail.host=$(gcloud secrets versions access latest
+        --secret=spring_mail_host)" >> secrets.properties
+        
+        echo "spring.mail.port=$(gcloud secrets versions access latest
+        --secret=spring_mail_port)" >> secrets.properties
+        
+        echo "spring.mail.username=$(gcloud secrets versions access latest
+        --secret=spring_mail_username)" >> secrets.properties
+        
+        echo "spring.mail.password=$(gcloud secrets versions access latest
+        --secret=spring_mail_password)" >> secrets.properties
     entrypoint: bash
   - name: 'maven:3.9.9-amazoncorretto-17-al2023'
     args:
