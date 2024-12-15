@@ -23,9 +23,10 @@ public class ExistingUserState extends StateTemplate{
     private MessageContextRepository messageContextRepository;
 
     @Autowired
-    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ClientVirtualAssistantState clientVirtualAssistantState) {
+    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ClientVirtualAssistantState clientVirtualAssistantState, DocumentResponseState documentResponseState) {
         super(new ArrayList<>(){{
             add(processFileIntransitableState);
+            add(documentResponseState);
             add(adminCommandState);
             add(clientVirtualAssistantState);
         }});
