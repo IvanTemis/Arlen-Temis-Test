@@ -64,16 +64,21 @@ public class WhatsappBotController {
                 log.info("Se creó un nuevo servicio para el usuario con número: {}", phoneNumber);
             }
 
-            var messageContext = MessageContextEntity.builder()
+            var messageContextBuilder = MessageContextEntity.builder()
                     .messageId("twilio:" + SmsMessageSid)
                     .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                     .nickName(nickName)
                     .body(userMessage)
                     .messageSource(MessageSource.TWILIO)
-                    .request(new HashMap<>(requestBody))
-                    .build();
+                    .request(new HashMap<>(requestBody));
 
-            var response = firstContactState.Evaluate(messageContext);
+            if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
+
+                messageContextBuilder.mediaUrl(requestBody.get("MediaUrl0")).mediaContentType(requestBody.get("MediaContentType0"));
+
+            }
+
+            var response = firstContactState.Evaluate(messageContextBuilder.build());
             log.info("Respuesta generada: {}", response);
 
             messageService.sendResponseToUser(response);
