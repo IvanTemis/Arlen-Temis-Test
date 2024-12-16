@@ -28,9 +28,9 @@ public class RequirementEntity {
     @Column(nullable = false)
     private Boolean isCompleted = false;
 
+    @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    @ManyToOne(optional = false, targetEntity = ServiceEntity.class)
-    ServiceEntity serviceEntity;
+    private ServiceEntity serviceEntity;
 
     @JoinColumn(nullable = true, name = "document_id")
     @OneToOne(optional = true, targetEntity = DocumentEntity.class)

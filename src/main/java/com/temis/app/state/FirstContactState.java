@@ -34,7 +34,6 @@ public class FirstContactState extends StateTemplate{
 
     @Override
     public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
-        //Guardamos antes y después para almacenar los cambios
         messageContextRepository.save(message);
         var result = super.Evaluate(message);
         messageContextRepository.save(message);

@@ -38,7 +38,7 @@ public class BeginDocumentCreationState extends  StateWithUserTemplate{
 
         assert user.getEmployee() != null;
 
-        var service = ServiceEntity.builder(user.getEmployee())
+       /* var service = ServiceEntity.builder(user.getEmployee())
                 .description("Mamahuevo")
                 .isActive(true)
                 .build();
@@ -49,7 +49,7 @@ public class BeginDocumentCreationState extends  StateWithUserTemplate{
                 RequirementEntity.builder(service).requirementType(RequirementType.DOCUMENT).build()
         );
 
-        requirementRepository.saveAll(requirements);
+        requirementRepository.saveAll(requirements); */
 
         responseBuilder.body("*No hace nada*");
 

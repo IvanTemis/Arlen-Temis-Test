@@ -1,8 +1,11 @@
 package com.temis.app.controller;
 
 import com.temis.app.entity.MessageContextEntity;
+import com.temis.app.entity.ServiceEntity;
 import com.temis.app.model.MessageSource;
+import com.temis.app.model.ServiceState;
 import com.temis.app.service.MessageService;
+import com.temis.app.service.ServiceEntityService;
 import com.temis.app.state.FirstContactState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/whatsapp-bot")
@@ -22,11 +27,14 @@ public class WhatsappBotController {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private ServiceEntityService serviceEntityService;
+
     @PostMapping("/webhook")
     public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) {
         try {
             String userMessage = requestBody.get("Body");
-            String phoneNumber = requestBody.get("From");
+            String phoneNumber = requestBody.get("From").replace("whatsapp:", "");
             String nickName = requestBody.get("ProfileName");
             String SmsMessageSid = requestBody.get("SmsMessageSid");
 
@@ -36,6 +44,25 @@ public class WhatsappBotController {
             }
 
             log.info("Mensaje recibido: {}", requestBody);
+
+            ServiceEntity existingService = serviceEntityService.findActiveServiceByPhoneNumber(phoneNumber);
+
+            if (existingService != null) {
+                log.info("El usuario con número {} ya tiene un servicio activo: {}", phoneNumber, existingService.getId());
+            } 
+            else {
+                ServiceEntity newService = ServiceEntity.hiddenBuilder()
+                .description("Nuevo servicio para el usuario: " + phoneNumber)
+                .phoneNumber(phoneNumber)
+                .isActive(true)
+                .creationDate(Timestamp.from(Instant.now()))
+                .priority(1)
+                .serviceState(ServiceState.PENDING)
+                .build();
+
+                serviceEntityService.saveService(newService);
+                log.info("Se creó un nuevo servicio para el usuario con número: {}", phoneNumber);
+            }
 
             var messageContext = MessageContextEntity.builder()
                     .messageId("twilio:" + SmsMessageSid)
