@@ -2,13 +2,11 @@ package com.temis.app.entity;
 
 import com.temis.app.model.ServiceState;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import org.springframework.data.annotation.CreatedDate;
 
+import javax.annotation.Nullable;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -49,5 +47,11 @@ public class ServiceEntity {
 
     @Column(nullable = false, unique = true)
     private String phoneNumber;
+
+    @Setter
+    @Nullable
+    @JoinColumn(nullable = true, name = "user_id")
+    @ManyToOne(optional = true, targetEntity = UserEntity.class)
+    UserEntity userEntity;
 
 }

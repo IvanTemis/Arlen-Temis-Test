@@ -4,10 +4,7 @@ import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.repository.UserRepository;
-import com.temis.app.state.with_user.ClientVirtualAssistantState;
-import com.temis.app.state.with_user.AdminCommandState;
-import com.temis.app.state.with_user.BeginDocumentCreationState;
-import com.temis.app.state.with_user.ProcessFileIntransitableState;
+import com.temis.app.state.with_user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +20,11 @@ public class ExistingUserState extends StateTemplate{
     private MessageContextRepository messageContextRepository;
 
     @Autowired
-    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ClientVirtualAssistantState clientVirtualAssistantState, DocumentResponseState documentResponseState) {
+    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ServiceEntityState serviceEntityState, DocumentResponseState documentResponseState) {
         super(new ArrayList<>(){{
             add(processFileIntransitableState);
-            add(documentResponseState);
             add(adminCommandState);
-            add(clientVirtualAssistantState);
+            add(serviceEntityState);
         }});
     }
 

@@ -27,9 +27,6 @@ public class WhatsappBotController {
     @Autowired
     private MessageService messageService;
 
-    @Autowired
-    private ServiceEntityService serviceEntityService;
-
     @PostMapping("/webhook")
     public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) {
         try {
@@ -45,24 +42,6 @@ public class WhatsappBotController {
 
             log.info("Mensaje recibido: {}", requestBody);
 
-            ServiceEntity existingService = serviceEntityService.findActiveServiceByPhoneNumber(phoneNumber);
-
-            if (existingService != null) {
-                log.info("El usuario con número {} ya tiene un servicio activo: {}", phoneNumber, existingService.getId());
-            } 
-            else {
-                ServiceEntity newService = ServiceEntity.hiddenBuilder()
-                .description("Nuevo servicio para el usuario: " + phoneNumber)
-                .phoneNumber(phoneNumber)
-                .isActive(true)
-                .creationDate(Timestamp.from(Instant.now()))
-                .priority(1)
-                .serviceState(ServiceState.PENDING)
-                .build();
-
-                serviceEntityService.saveService(newService);
-                log.info("Se creó un nuevo servicio para el usuario con número: {}", phoneNumber);
-            }
 
             var messageContextBuilder = MessageContextEntity.builder()
                     .messageId("twilio:" + SmsMessageSid)
