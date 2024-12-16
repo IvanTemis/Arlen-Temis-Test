@@ -1,6 +1,7 @@
 package com.temis.app.service.impl;
 
 import com.temis.app.entity.ServiceEntity;
+import com.temis.app.entity.UserEntity;
 import com.temis.app.repository.ServiceRepository;
 import com.temis.app.service.ServiceEntityService;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,11 @@ public class ServiceEntityServiceImpl implements ServiceEntityService {
     public ServiceEntity saveService(ServiceEntity serviceEntity) {
         return serviceEntityRepository.save(serviceEntity);
 }
+
+    @Override
+    public void deactivateServicesForUser(UserEntity user) {
+        var services = serviceEntityRepository.findByUser(user);
+        serviceEntityRepository.deleteAll(services);
+    }
 
 }

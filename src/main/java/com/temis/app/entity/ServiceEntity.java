@@ -52,6 +52,6 @@ public class ServiceEntity {
     @Nullable
     @JoinColumn(nullable = true, name = "user_id")
     @ManyToOne(optional = true, targetEntity = UserEntity.class)
-    UserEntity userEntity;
+    UserEntity user;
 
 }

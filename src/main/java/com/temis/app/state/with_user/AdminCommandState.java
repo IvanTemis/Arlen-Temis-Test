@@ -4,8 +4,10 @@ import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.entity.*;
+import com.temis.app.repository.UserRepository;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.service.EmailService;
+import com.temis.app.service.ServiceEntityService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -20,6 +22,8 @@ public class AdminCommandState extends  StateWithUserTemplate{
 
     @Autowired
     VertexAiContentRepository vertexAiContextRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     ChatAIClient chatAIClient;
@@ -28,6 +32,8 @@ public class AdminCommandState extends  StateWithUserTemplate{
 
     @Autowired
     EmailService emailService;
+    @Autowired
+    ServiceEntityService serviceEntityService;
 
     @Autowired
     private CloudStorageClient cloudStorageClient;
@@ -59,6 +65,11 @@ public class AdminCommandState extends  StateWithUserTemplate{
                 var history = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
                 vertexAiContextRepository.deleteAll(history);
+
+                user.setLastInteractionDate(null);
+                userRepository.save(user);
+
+                serviceEntityService.deactivateServicesForUser(user);
 
                 responseBuilder.body("Contexto historico del agente limpiado.");
             }
