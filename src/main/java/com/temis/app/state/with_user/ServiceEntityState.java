@@ -42,7 +42,7 @@ public class ServiceEntityState extends  StateWithUserTemplate{
                     .isActive(true)
                     .creationDate(Timestamp.from(Instant.now()))
                     .priority(1)
-                    .userEntity(user)
+                    .user(user)
                     .serviceState(com.temis.app.model.ServiceState.PENDING)
                     .build();
 
