@@ -14,6 +14,7 @@ import com.temis.app.model.VertexAiRole;
 import com.temis.app.repository.UserRepository;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.service.ClientVirtualAssistantService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,8 @@ import java.util.List;
 
 @Component
 public class ClientVirtualAssistantState extends  StateWithUserTemplate{
+
+    static final String END_STAGE = "END_STAGE_1";
 
     @Autowired
     private ClientVirtualAssistantService clientVirtualAssistantService;
@@ -57,6 +60,19 @@ public class ClientVirtualAssistantState extends  StateWithUserTemplate{
             text += ":";
         }
 
-        responseBuilder.body(clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user));
+        String result = clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user);
+
+        if(result.contains(END_STAGE)){
+            var endIndex = result.indexOf(END_STAGE);
+
+            String json = result.substring(endIndex + END_STAGE.length()).trim();
+
+
+            log.info("Se finalizó primer etapa con json: {}", json);
+
+            result = result.substring(0, endIndex);
+        }
+
+        responseBuilder.body(result);
     }
 }
