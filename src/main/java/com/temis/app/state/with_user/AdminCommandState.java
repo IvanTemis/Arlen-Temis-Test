@@ -5,6 +5,7 @@ import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.entity.*;
 import com.temis.app.manager.AgentManager;
+import com.temis.app.repository.MessageResponseRepository;
 import com.temis.app.repository.UserRepository;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.service.EmailService;
@@ -25,6 +26,8 @@ public class AdminCommandState extends  StateWithUserTemplate{
     VertexAiContentRepository vertexAiContextRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    MessageResponseRepository messageResponseRepository;
 
     @Autowired
     AgentManager agentManager;
@@ -106,6 +109,24 @@ public class AdminCommandState extends  StateWithUserTemplate{
                 }
 
                 responseBuilder.body("Email de prueba enviado a tu correo.");
+            }
+            break;
+            case "!resend":
+            {
+                log.info("Resending message with ID {}", split[1]);
+                long id = Long.parseLong(split[1], 10);
+                var resend = messageResponseRepository.findById(id);
+
+                if(resend.isEmpty()){
+                    responseBuilder.body("Respuesta con ID " + id + " no encontrada.");
+                    break;
+                }
+
+                var resp = resend.get();
+
+                responseBuilder
+                        .body(resp.getBody())
+                        .mediaURL(resp.getMediaURL());
             }
             break;
             default:

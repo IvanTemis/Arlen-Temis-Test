@@ -3,10 +3,7 @@ package com.temis.app.entity;
 import com.temis.app.converter.JsonConverter;
 import com.temis.app.model.MessageSource;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -22,6 +19,8 @@ import static jakarta.persistence.EnumType.STRING;
 @Getter
 @Entity
 @Table(name = "message_context")
+@NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class MessageContextEntity {
     @Id
@@ -68,6 +67,12 @@ public class MessageContextEntity {
     @JoinColumn(nullable = true, name = "user_id")
     @ManyToOne(optional = true, targetEntity = UserEntity.class)
     UserEntity userEntity;
+
+    @Setter
+    @Nullable
+    @JoinColumn(nullable = true, name = "service_id")
+    @ManyToOne(optional = true, targetEntity = ServiceEntity.class)
+    ServiceEntity serviceEntity;
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

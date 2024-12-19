@@ -32,7 +32,9 @@ public class TwilioMessageService implements MessagePlatformService {
         try {
             List<String> sentences = TextUtils.splitIntoSentences(response.getBody());
             for (int i = 0; i < sentences.size(); i++) {
-                String sentence = sentences.get(i);
+                String sentence = sentences.get(i).trim();
+
+                if(sentence.isEmpty()) continue;
 
                 var message = Message.creator(
                         new PhoneNumber("whatsapp:" + response.getPhoneNumber()),

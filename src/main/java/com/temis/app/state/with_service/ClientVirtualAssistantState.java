@@ -1,32 +1,28 @@
-package com.temis.app.state.with_user;
+package com.temis.app.state.with_service;
 
-import com.google.cloud.vertexai.api.Content;
-import com.google.cloud.vertexai.api.FileData;
-import com.google.cloud.vertexai.api.Part;
-import com.google.cloud.vertexai.generativeai.ResponseHandler;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.temis.app.client.ChatAIClient;
+import com.google.gson.Gson;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
+import com.temis.app.entity.ServiceEntity;
 import com.temis.app.entity.UserEntity;
-import com.temis.app.entity.VertexAiContentEntity;
-import com.temis.app.model.VertexAiRole;
-import com.temis.app.repository.UserRepository;
-import com.temis.app.repository.VertexAiContentRepository;
+import com.temis.app.exception.JSONNotFoundException;
+import com.temis.app.model.ServiceStage;
 import com.temis.app.service.ClientVirtualAssistantService;
-import lombok.extern.slf4j.Slf4j;
+import com.temis.app.state.with_user.StateWithUserTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.regex.Pattern;
 
 @Component
-public class ClientVirtualAssistantState extends  StateWithUserTemplate{
+public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
     static final String END_STAGE = "END_STAGE_1";
+
+
+    Pattern jsonPattern = Pattern.compile("(\\[*\\{(?:.*|[\\n\\t\\r]*)+?\\}\\]*)",
+            Pattern.CASE_INSENSITIVE);
 
     @Autowired
     private ClientVirtualAssistantService clientVirtualAssistantService;
@@ -37,12 +33,12 @@ public class ClientVirtualAssistantState extends  StateWithUserTemplate{
     }
 
     @Override
-    protected boolean ShouldTransitionWithUser(MessageContextEntity message, UserEntity user) {
+    protected boolean ShouldTransitionWithService(MessageContextEntity message, UserEntity user, ServiceEntity service) {
         return true;
     }
 
     @Override
-    protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws Exception {
+    protected void ExecuteWithService(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user, ServiceEntity service) throws Exception {
         if (message.getMediaUrl() == null && message.getBody().isEmpty()) {
             responseBuilder.body("Lo siento, no puedo procesar mensajes vacíos.");
             return;
@@ -63,14 +59,24 @@ public class ClientVirtualAssistantState extends  StateWithUserTemplate{
         String result = clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user,"agent123");
 
         if(result.contains(END_STAGE)){
-            var endIndex = result.indexOf(END_STAGE);
 
-            String json = result.substring(endIndex + END_STAGE.length()).trim();
+            result = result.replace(END_STAGE, "");
+            
+            service.setServiceStage(ServiceStage.DOCUMENT_COLLECTION);
 
+            var matcher = jsonPattern.matcher(result);
 
-            log.info("Se finalizó primer etapa con json: {}", json);
+            if(matcher.find()){
 
-            result = result.substring(0, endIndex);
+                var json = matcher.group(1);
+
+                log.info("Se finalizó primer etapa con json: {}", json);
+
+                result = result.replace(json, "").replace("```json", "").trim();
+            }
+            else{
+                throw new JSONNotFoundException("Se intentó finalizar la etapa SOCIETY_IDENTIFICATION del agente pero no se encontró un JSON válido");
+            }
         }
 
         responseBuilder.body(result);

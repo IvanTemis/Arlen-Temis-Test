@@ -25,7 +25,10 @@ public class ServiceEntityServiceImpl implements ServiceEntityService {
     @Override
     public void deactivateServicesForUser(UserEntity user) {
         var services = serviceEntityRepository.findByUser(user);
-        serviceEntityRepository.deleteAll(services);
+        for (ServiceEntity service : services) {
+            service.setIsActive(false);
+        }
+        serviceEntityRepository.saveAll(services);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.temis.app.entity;
 
+import com.temis.app.model.ServiceStage;
 import com.temis.app.model.ServiceState;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,6 +33,10 @@ public class ServiceEntity {
     ServiceState serviceState = ServiceState.PENDING;
 
     @Column(nullable = false)
+    @Enumerated(STRING)
+    ServiceStage serviceStage = ServiceStage.UNKNOWN;
+
+    @Column(nullable = false)
     private Integer priority = 0;
 
     @OneToMany(mappedBy = "serviceEntity", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -45,7 +50,7 @@ public class ServiceEntity {
     @Column(nullable = false)
     private Boolean isActive;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String phoneNumber;
 
     @Setter

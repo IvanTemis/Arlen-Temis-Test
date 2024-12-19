@@ -3,6 +3,7 @@ package com.temis.app.state;
 import com.google.api.gax.rpc.ResourceExhaustedException;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
+import com.temis.app.exception.JSONNotFoundException;
 import com.temis.app.repository.MessageResponseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,10 @@ public abstract class StateTemplate {
         catch (ResourceExhaustedException e){
             exception = e;
             exceptionMessage = "Se ha superado la quota por minuto. Por favor espera un momento antes de continuar la conversación.";
+        }
+        catch (JSONNotFoundException e){
+            exception = e;
+            exceptionMessage = e.getMessage();
         }
         catch (Exception e) {
             exception = e;
