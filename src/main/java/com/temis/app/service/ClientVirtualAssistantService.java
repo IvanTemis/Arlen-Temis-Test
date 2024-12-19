@@ -3,9 +3,7 @@ package com.temis.app.service;
 import com.temis.app.entity.DocumentEntity;
 import com.temis.app.entity.UserEntity;
 
-import java.io.IOException;
-
 public interface ClientVirtualAssistantService {
 
-    String respondToUserMessage(String text, DocumentEntity document, UserEntity user) throws Exception;
+    String respondToUserMessage(String text, DocumentEntity document, UserEntity user, String agentId) throws Exception;
 }

@@ -40,14 +40,18 @@ public class VertexAiContentEntity {
     @ManyToOne(optional = false, targetEntity = UserEntity.class)
     UserEntity userEntity;
 
+    @Column(nullable = false, name = "agent_id")
+    private String agentId;
+
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdDate;
 
-    public static VertexAiContentEntity fromContent(UserEntity userEntity, Content content){
+    public static VertexAiContentEntity fromContent(UserEntity userEntity, Content content, String agentId){
         var result = new VertexAiContentEntity();
         result.userEntity = userEntity;
+        result.agentId = agentId;
         result.role = VertexAiRole.valueOf(content.getRole().toUpperCase());
         result.parts = content.getPartsList().stream().map(AbstractMessageLite::toByteArray).toList();
         return result;

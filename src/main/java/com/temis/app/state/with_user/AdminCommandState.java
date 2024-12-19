@@ -4,6 +4,7 @@ import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.entity.*;
+import com.temis.app.manager.AgentManager;
 import com.temis.app.repository.UserRepository;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.service.EmailService;
@@ -26,7 +27,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
     UserRepository userRepository;
 
     @Autowired
-    ChatAIClient chatAIClient;
+    AgentManager agentManager;
     @Autowired
     private DocumentClassifierClient documentClassifierClient;
 
@@ -78,7 +79,8 @@ public class AdminCommandState extends  StateWithUserTemplate{
             case "!updateprompt":
             case "!refreshprompt":
             {
-                chatAIClient.UpdatePrompt();
+                ChatAIClient chatAIClient = agentManager.getAgent("agent123");
+                chatAIClient.UpdatePrompt("agent123");
                 documentClassifierClient.UpdatePrompt();
                 responseBuilder.body("Prompt actualizado exitosamente.");
             }

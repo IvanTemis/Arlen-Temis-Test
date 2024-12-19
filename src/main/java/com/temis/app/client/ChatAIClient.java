@@ -3,10 +3,8 @@ package com.temis.app.client;
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.*;
 import com.google.cloud.vertexai.generativeai.*;
-import com.google.protobuf.ByteString;
 import com.temis.app.utils.VertexAIUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -23,18 +21,16 @@ public class ChatAIClient {
 
     private final CloudStorageClient cloudStorageClient;
 
-    // Constructor para inicializar con los parámetros dinámicos
-    public ChatAIClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient) throws IOException {
+    public ChatAIClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient, String agentId) throws IOException {
         this.cloudStorageClient = cloudStorageClient;
         this.vertexAi = new VertexAI(projectId, location);
 
-        // Configuración de generación y seguridad por defecto
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
                 .setMaxOutputTokens(512)
                 .setTemperature(0.5F)
                 .setTopP(0.9F)
                 .build();
-        //TODO: SafetySetting.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE genera una exepción en vez de corregir el resultado
+
         List<SafetySetting> safetySettings = Arrays.asList(
                 SafetySetting.newBuilder()
                         .setCategory(HarmCategory.HARM_CATEGORY_HATE_SPEECH)
@@ -54,9 +50,8 @@ public class ChatAIClient {
                         .build()
         );
 
-        UpdatePrompt();
+        UpdatePrompt(agentId);
 
-        // Construir el modelo generativo
         this.baseModel = new GenerativeModel.Builder()
                 .setModelName(modelName)
                 .setVertexAi(vertexAi)
@@ -67,12 +62,12 @@ public class ChatAIClient {
     }
 
 
-    public void UpdatePrompt() throws IOException {
-        log.info("Updating prompt for ChatAI...");
-        systemInstruction = cloudStorageClient.ReadFile("gs://temis-storage/valanz/model/prompt.txt");
+    public void UpdatePrompt(String agentId) throws IOException {
+        log.info("Updating prompt for agent: {}", agentId);
+        String promptPath = String.format("gs://temis-storage/prompts/%s.txt", agentId);
+        this.systemInstruction = cloudStorageClient.ReadFile(promptPath);
     }
 
-    // Cerrar el cliente Vertex AI
     public void close() throws Exception {
         this.vertexAi.close();
     }

@@ -60,7 +60,7 @@ public class ClientVirtualAssistantState extends  StateWithUserTemplate{
             text += ":";
         }
 
-        String result = clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user);
+        String result = clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user,"agent123");
 
         if(result.contains(END_STAGE)){
             var endIndex = result.indexOf(END_STAGE);

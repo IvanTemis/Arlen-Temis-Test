@@ -11,4 +11,5 @@ import java.util.List;
 @Repository
 public interface VertexAiContentRepository extends CrudRepository<VertexAiContentEntity, Long> {
     List<VertexAiContentEntity> findByUserEntityOrderByCreatedDateAsc(UserEntity userEntity);
+    List<VertexAiContentEntity> findByUserEntityAndAgentIdOrderByCreatedDateAsc(UserEntity userEntity, String agentId);
 }

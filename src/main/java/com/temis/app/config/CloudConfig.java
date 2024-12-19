@@ -1,6 +1,5 @@
 package com.temis.app.config;
 
-import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.client.VertexAIClient;
@@ -37,17 +36,6 @@ public class CloudConfig {
         return new CloudStorageClient(
                 cloudConfigProperties.getProjectId(),
                 cloudConfigProperties.getStorage().getBucketName()
-        );
-    }
-
-    @Bean
-    @DependsOn({"cloudStorageClient"})
-    public ChatAIClient chatAIClient(@Autowired CloudStorageClient cloudStorageClient) throws IOException {
-        return new ChatAIClient(
-                cloudConfigProperties.getProjectId(),
-                cloudConfigProperties.getLocation(),
-                cloudConfigProperties.getVertexai().getModelName(),
-                cloudStorageClient
         );
     }
 
