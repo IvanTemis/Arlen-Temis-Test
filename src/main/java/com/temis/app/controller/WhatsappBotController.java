@@ -1,11 +1,8 @@
 package com.temis.app.controller;
 
 import com.temis.app.entity.MessageContextEntity;
-import com.temis.app.entity.ServiceEntity;
 import com.temis.app.model.MessageSource;
-import com.temis.app.model.ServiceState;
 import com.temis.app.service.MessageService;
-import com.temis.app.service.ServiceEntityService;
 import com.temis.app.state.FirstContactState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.sql.Timestamp;
-import java.time.Instant;
 
 @RestController
 @RequestMapping("/whatsapp-bot")

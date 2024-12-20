@@ -91,4 +91,12 @@ public class VertexAIUtils {
             throw new InterruptedException("Interrupted Backoff without an exception.");
         }
     }
+
+    public static Content createTextContent(String text) {
+        return Content.newBuilder()
+                .setRole(VertexAiRole.USER.toString())
+                .addParts(Part.newBuilder().setText(text).build())
+                .build();
+    }
+
 }

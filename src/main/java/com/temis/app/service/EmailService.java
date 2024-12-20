@@ -1,11 +1,9 @@
 package com.temis.app.service;
 
-import com.temis.app.model.DocumentSummarizeDTO;
 import jakarta.mail.MessagingException;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.util.Pair;
 
-import java.io.IOException;
 
 public interface EmailService {
 

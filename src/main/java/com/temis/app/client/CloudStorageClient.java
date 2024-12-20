@@ -125,4 +125,29 @@ public class CloudStorageClient {
             return result.toByteArray();
         }
     }
+
+    public String getMimeType(String objectUri) throws IOException {
+        if (!objectUri.startsWith("gs://")) {
+            throw new IllegalArgumentException("El URI debe comenzar con 'gs://'");
+        }
+    
+        String uri = objectUri.replace("gs://", "");
+        int slash = uri.indexOf('/');
+        if (slash == -1) {
+            throw new IllegalArgumentException("El URI no contiene un nombre de objeto válido");
+        }
+    
+        String bucketName = uri.substring(0, slash);
+        String objectName = uri.substring(slash + 1);
+    
+        BlobId blobId = BlobId.of(bucketName, objectName);
+        Blob blob = storage.get(blobId);
+    
+        if (blob == null) {
+            throw new InvalidPathException(objectUri, "El archivo no existe en el bucket");
+        }
+    
+        return blob.getContentType();
+    }
+
 }

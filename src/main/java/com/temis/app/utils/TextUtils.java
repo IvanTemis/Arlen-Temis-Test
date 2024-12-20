@@ -1,7 +1,5 @@
 package com.temis.app.utils;
 
-import org.conscrypt.ClientSessionContext;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

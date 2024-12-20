@@ -26,7 +26,7 @@ public class ChatAIClient {
         this.vertexAi = new VertexAI(projectId, location);
 
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
-                .setMaxOutputTokens(512)
+                .setMaxOutputTokens(2048)
                 .setTemperature(0.5F)
                 .setTopP(0.9F)
                 .build();
@@ -82,6 +82,20 @@ public class ChatAIClient {
         return VertexAIUtils.ExponentialBackoff(10,100,10000,() -> {
             try {
                 return chatSession.sendMessage(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, log);
+    }
+
+    public ResponseStream<GenerateContentResponse> startStreaming(Content message, String context) throws Exception {
+        var model = baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
+    
+        ChatSession chatSession = model.startChat();
+    
+        return VertexAIUtils.ExponentialBackoff(10, 100, 10000, () -> {
+            try {
+                return chatSession.sendMessageStream(message);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
