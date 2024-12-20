@@ -16,6 +16,7 @@ public class ChatAIClient {
 
     private final VertexAI vertexAi;
     private final GenerativeModel baseModel;
+    private final String agentId;
 
     private String systemInstruction = null;
 
@@ -23,6 +24,7 @@ public class ChatAIClient {
 
     public ChatAIClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient, String agentId) throws IOException {
         this.cloudStorageClient = cloudStorageClient;
+        this.agentId = agentId;
         this.vertexAi = new VertexAI(projectId, location);
 
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
@@ -50,7 +52,7 @@ public class ChatAIClient {
                         .build()
         );
 
-        UpdatePrompt(agentId);
+        UpdatePrompt();
 
         this.baseModel = new GenerativeModel.Builder()
                 .setModelName(modelName)
@@ -62,7 +64,7 @@ public class ChatAIClient {
     }
 
 
-    public void UpdatePrompt(String agentId) throws IOException {
+    public void UpdatePrompt() throws IOException {
         log.info("Updating prompt for agent: {}", agentId);
         String promptPath = String.format("gs://temis-storage/prompts/%s.txt", agentId);
         this.systemInstruction = cloudStorageClient.ReadFile(promptPath);

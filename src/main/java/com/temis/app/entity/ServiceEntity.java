@@ -6,9 +6,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -19,6 +21,7 @@ import static jakarta.persistence.EnumType.STRING;
 @Entity
 @Builder(builderMethodName = "hiddenBuilder")
 @Table(name = "service")
+@EntityListeners(AuditingEntityListener.class)
 public class ServiceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,9 +46,8 @@ public class ServiceEntity {
     private List<RequirementEntity> requirementEntities;
 
     @Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private Timestamp creationDate;
+    private Date creationDate;
 
     @Column(nullable = false)
     private Boolean isActive;
@@ -58,5 +60,8 @@ public class ServiceEntity {
     @JoinColumn(nullable = true, name = "user_id")
     @ManyToOne(optional = true, targetEntity = UserEntity.class)
     UserEntity user;
+
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StageContextEntity> stageContextEntities;
 
 }
