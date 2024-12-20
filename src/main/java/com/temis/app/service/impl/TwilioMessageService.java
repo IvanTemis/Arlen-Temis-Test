@@ -47,7 +47,7 @@ public class TwilioMessageService implements MessagePlatformService {
                 message.create();
                 log.info("Mensaje enviado a {}: {}", response.getPhoneNumber(), sentence);
 
-                Thread.sleep(1000);
+                Thread.sleep(2000);
             }
         } catch (Exception e) {
             log.error("Error al enviar mensaje a {}: {}", response.getPhoneNumber(), e.getMessage(), e);
