@@ -23,7 +23,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
 
     @Override
-    public String respondToUserMessage(String text, DocumentEntity document, UserEntity user, String agentId) throws Exception {
+    public String respondToUserMessage(String text, DocumentEntity document, UserEntity user, String agentId, String context) throws Exception {
         Content content;
         if(document != null){
             content = VertexAIUtils.ContentWithDocument(text, document.getPath(), document.getFileType());
@@ -39,15 +39,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content, agentId));
 
         ChatAIClient chatAIClient = agentManager.getAgent(agentId);
-        var response = chatAIClient.sendMessage(
-            content,
-            history,
-                "\nContexto de la conversación:\n" +
-                "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
-                "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
-                "\t- Fecha y Hora de la última interacción: " + 
-                (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n"
-        );
+        var response = chatAIClient.sendMessage(content, history, context);
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response), agentId));
 

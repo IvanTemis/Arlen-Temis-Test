@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -36,9 +37,13 @@ public class AgentManager {
         });
     }
 
+    public Collection<ChatAIClient> getAllAgents(){
+        return agents.values();
+    }
+
     public void updatePrompt(String agentId) throws IOException {
         if (agents.containsKey(agentId)) {
-            agents.get(agentId).UpdatePrompt(agentId);
+            agents.get(agentId).UpdatePrompt();
         } else {
             throw new IllegalArgumentException("Agent not found: " + agentId);
         }

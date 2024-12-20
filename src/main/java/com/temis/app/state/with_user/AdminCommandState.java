@@ -82,10 +82,11 @@ public class AdminCommandState extends  StateWithUserTemplate{
             case "!updateprompt":
             case "!refreshprompt":
             {
-                ChatAIClient chatAIClient = agentManager.getAgent("agent123");
-                chatAIClient.UpdatePrompt("agent123");
+                for (ChatAIClient agent : agentManager.getAllAgents()) {
+                    agent.UpdatePrompt();
+                }
                 documentClassifierClient.UpdatePrompt();
-                responseBuilder.body("Prompt actualizado exitosamente.");
+                responseBuilder.body("Prompts actualizados exitosamente.");
             }
             break;
             case "!emailtest":{
