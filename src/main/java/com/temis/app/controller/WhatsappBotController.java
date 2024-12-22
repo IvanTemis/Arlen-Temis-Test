@@ -51,7 +51,7 @@ public class WhatsappBotController {
                     .messageSource(MessageSource.TWILIO)
                     .request(new HashMap<>(requestBody));
 
-            if ("1".equals(requestBody.get("NumMedia"))) { //TODO: Checar https://www.twilio.com/docs/messaging/api/media-resource#fetch-a-media-resource
+            if ("1".equals(requestBody.get("NumMedia"))) { 
 
                 messageContextBuilder.mediaUrl(requestBody.get("MediaUrl0")).mediaContentType(requestBody.get("MediaContentType0"));
 
