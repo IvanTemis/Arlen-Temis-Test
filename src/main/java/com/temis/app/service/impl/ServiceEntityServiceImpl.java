@@ -19,8 +19,13 @@ public class ServiceEntityServiceImpl implements ServiceEntityService {
     }
     @Override
     public ServiceEntity saveService(ServiceEntity serviceEntity) {
-        return serviceEntityRepository.save(serviceEntity);
-}
+        var ser = serviceEntityRepository.save(serviceEntity);
+
+        var found = serviceEntityRepository.findById(ser.getId());
+
+        return found.orElse(ser);
+
+    }
 
     @Override
     public void deactivateServicesForUser(UserEntity user) {

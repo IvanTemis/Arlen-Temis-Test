@@ -30,6 +30,8 @@ public class WhatsappBotController {
 
     @Autowired
     private MessageContextRepository messageContextRepository;
+
+    @Autowired
     private MessageContextContentRepository messageContextContentRepository;
 
     @PostMapping("/webhook")
@@ -46,13 +48,14 @@ public class WhatsappBotController {
 
         log.info("Mensaje recibido: {}", requestBody);
 
-        var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreateDateAsc(phoneNumber);
+        var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber);
 
         if (context == null) {
             context = MessageContextEntity.builder()
                     .phoneNumber(phoneNumber.replace("whatsapp:", ""))
                     .nickName(nickName)
                     .messageSource(MessageSource.TWILIO)
+                    .isActive(true)
                     .build();
 
 

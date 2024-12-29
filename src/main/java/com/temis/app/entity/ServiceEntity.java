@@ -42,7 +42,7 @@ public class ServiceEntity {
     @Column(nullable = false)
     private Integer priority = 0;
 
-    @OneToMany(mappedBy = "serviceEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "serviceEntity", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     private List<RequirementEntity> requirementEntities;
 
     @Column(nullable = false, updatable = false)

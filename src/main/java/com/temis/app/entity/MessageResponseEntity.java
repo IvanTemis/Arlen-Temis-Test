@@ -31,7 +31,8 @@ public class MessageResponseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "response", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdDate")
+    @OneToMany(mappedBy = "response", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     private List<MessageResponseContentEntity> responseContents;
 
     @Nullable

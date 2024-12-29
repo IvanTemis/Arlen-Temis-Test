@@ -52,6 +52,7 @@ public class ServiceEntityState extends  StateWithUserTemplate{
                     .creationDate(Timestamp.from(Instant.now()))
                     .priority(1)
                     .user(user)
+                    .requirementEntities(new ArrayList<>())
                     .serviceState(ServiceState.PENDING)
                     .serviceStage(ServiceStage.SOCIETY_IDENTIFICATION)
                     .build();
@@ -76,7 +77,7 @@ public class ServiceEntityState extends  StateWithUserTemplate{
         var service = message.getServiceEntity();
         if(service != null) {
             //service.setLastInteractionDate(new Date());
-            serviceEntityService.saveService(service);
+            message.setServiceEntity(serviceEntityService.saveService(service));
         }
         return result;
     }

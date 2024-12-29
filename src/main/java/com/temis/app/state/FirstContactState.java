@@ -34,6 +34,7 @@ public class FirstContactState extends StateTemplate{
 
     @Override
     public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
+        message.setActive(false);
         messageContextRepository.save(message);
         var result = super.Evaluate(message);
         messageContextRepository.save(message);

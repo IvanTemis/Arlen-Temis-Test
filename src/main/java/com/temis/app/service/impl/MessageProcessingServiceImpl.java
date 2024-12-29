@@ -1,8 +1,7 @@
 package com.temis.app.service.impl;
 
-import com.temis.app.entity.MessageContextEntity;
+import com.temis.app.entity.MessageContextContentEntity;
 import com.temis.app.entity.MessageResponseEntity;
-import com.temis.app.model.MessageSource;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.service.MessageProcessingService;
 import com.temis.app.service.MessageService;
@@ -11,8 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Comparator;
 import java.util.concurrent.*;
 
 @Service
@@ -44,13 +42,13 @@ public class MessageProcessingServiceImpl implements MessageProcessingService {
             } catch (Exception e) {
                 log.error("Error durante procesamiento de mensajes acumulados para " + phoneNumber, e);
             }
-        }, 5, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS);
         userTimers.put(phoneNumber, timer);
     }
 
     private void processAccumulatedMessages(String phoneNumber) throws Exception {
 
-        var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreateDateAsc(phoneNumber);
+        var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber);
 
         log.info("Procesando {} mensaje/s acumulados de {}: {}", context.getMessageContents().size(), phoneNumber, context.getContentAsDebugString());
     

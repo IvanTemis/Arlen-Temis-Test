@@ -38,7 +38,9 @@ public class MessageContextEntity {
     @Enumerated(STRING)
     MessageSource messageSource;
 
-    @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OrderBy("createdDate")
+    @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     private List<MessageContextContentEntity> messageContents;
 
     @Setter
@@ -63,6 +65,7 @@ public class MessageContextEntity {
     @LastModifiedDate
     private Timestamp lastModifiedDate;
 
+    @Setter
     @Column(nullable = false)
     boolean isActive = true;
 
