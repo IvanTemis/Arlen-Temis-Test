@@ -5,21 +5,22 @@ import com.temis.app.model.MessageSource;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
 import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
 
 @Builder
 @Getter
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "message_context")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,39 +31,18 @@ public class MessageContextEntity {
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String messageId;
-
     @Column(nullable = false)
     String phoneNumber;
 
     @Column(nullable = false)
     String nickName;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    String body;
-
-    @Nullable
-    @Column(nullable = true, columnDefinition = "TEXT")
-    String mediaUrl;
-
-    @Nullable
-    @Column(nullable = true)
-    String mediaContentType;
-
     @Column(nullable = false)
     @Enumerated(STRING)
     MessageSource messageSource;
 
-    @Column(nullable = false, columnDefinition = "text")
-    @Convert(converter = JsonConverter.class)
-    Map<String, Object> request;
-
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "document_id")
-    @ManyToOne(optional = true, targetEntity = DocumentEntity.class)
-    DocumentEntity documentEntity;
+    @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageContentEntity> messageContents;
 
     @Setter
     @Nullable
@@ -80,4 +60,19 @@ public class MessageContextEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdDate;
+
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @LastModifiedDate
+    private Timestamp lastModifiedDate;
+
+    @Column(nullable = false)
+    boolean isActive = true;
+
+    public List<String> getBodies(){
+        return messageContents.stream().map(c -> c.body).toList();
+    }
+    public List<DocumentEntity> getDocumentEntities(){
+        return messageContents.stream().map(c -> c.documentEntity).filter(Objects::nonNull).toList();
+    }
 }

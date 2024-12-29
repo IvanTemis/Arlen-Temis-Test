@@ -23,7 +23,7 @@ public class BeginDocumentCreationState extends  StateWithUserTemplate{
 
     @Override
     protected boolean ShouldTransitionWithUser(MessageContextEntity message, UserEntity user) {
-        return message.getBody().equals(compraventa);
+        return message.getBodies().stream().anyMatch(b -> b.equals(compraventa));
     }
 
     @Override

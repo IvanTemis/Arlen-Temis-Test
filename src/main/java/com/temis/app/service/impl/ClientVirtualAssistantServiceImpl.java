@@ -29,14 +29,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
     private DraftEmailService draftEmailService;
 
     @Override
-    public String respondToUserMessage(String text, DocumentEntity document, UserEntity user, String agentId, String context) throws Exception {
-        Content content;
-        if(document != null){
-            content = VertexAIUtils.ContentWithDocument(text, document.getPath(), document.getFileType());
-        }
-        else {
-            content = VertexAIUtils.ContentWithDocument(text, null, null);
-        }
+    public String respondToUserMessage(Content content, UserEntity user, String agentId, String context) throws Exception {
 
         var contexts = vertexAiContextRepository.findByUserEntityAndAgentIdOrderByCreatedDateAsc(user, agentId);
 

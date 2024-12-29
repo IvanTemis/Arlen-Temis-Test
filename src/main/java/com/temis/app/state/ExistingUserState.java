@@ -20,7 +20,7 @@ public class ExistingUserState extends StateTemplate{
     private MessageContextRepository messageContextRepository;
 
     @Autowired
-    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ServiceEntityState serviceEntityState, DocumentResponseState documentResponseState) {
+    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ServiceEntityState serviceEntityState) {
         super(new ArrayList<>(){{
             add(processFileIntransitableState);
             add(adminCommandState);

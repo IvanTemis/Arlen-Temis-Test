@@ -3,9 +3,11 @@ package com.temis.app.state.with_user;
 import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.config.properties.TwilioConfigProperties;
 import com.temis.app.entity.DocumentEntity;
+import com.temis.app.entity.MessageContentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.UserEntity;
 import com.temis.app.repository.DocumentTypeRepository;
+import com.temis.app.repository.MessageContentRepository;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.service.DocumentClassificationService;
 import com.temis.app.service.FileStorageService;
@@ -37,60 +39,65 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
     private FileStorageService fileStorageService;
     @Autowired
     private DocumentClassificationService documentClassificationService;
+    @Autowired
+    private MessageContentRepository messageContentRepository;
 
     @Override
     protected void Intransitable(MessageContextEntity message, UserEntity user) throws Exception {
-        if(message.getMediaUrl() != null){
-            var mediaUrl = message.getMediaUrl();
-            var mediaContentType = message.getMediaContentType();
+        for (MessageContentEntity content : message.getMessageContents()) {
+            if(content.getMediaUrl() != null){
+                var mediaUrl = content.getMediaUrl();
+                var mediaContentType = content.getMediaContentType();
 
-            HttpHeaders headers = new HttpHeaders();
+                HttpHeaders headers = new HttpHeaders();
 
-            switch (message.getMessageSource()){
-                case TWILIO -> {
-                    String authStr = twilioConfigProperties.accountSid() + ":" + twilioConfigProperties.authToken();
+                switch (message.getMessageSource()){
+                    case TWILIO -> {
+                        String authStr = twilioConfigProperties.accountSid() + ":" + twilioConfigProperties.authToken();
 
-                    ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(authStr);
+                        ByteBuffer byteBuffer = StandardCharsets.UTF_8.encode(authStr);
 
-                    var authEncoded =  Base64.getEncoder().encodeToString(byteBuffer.array());
+                        var authEncoded =  Base64.getEncoder().encodeToString(byteBuffer.array());
 
-                    headers.add("Authorization", "Basic " + authEncoded);
+                        headers.add("Authorization", "Basic " + authEncoded);
 
+                    }
+                    case META -> throw new UnsupportedOperationException();
+                    default -> throw new UnsupportedOperationException();
                 }
-                case META -> throw new UnsupportedOperationException();
-                default -> throw new UnsupportedOperationException();
+
+                headers.add("Accept", mediaContentType);
+
+                var stream = WebClient.builder()
+                        .clientConnector(new ReactorClientHttpConnector(
+                                HttpClient.create().followRedirect(true)
+                        )).build().get()
+                        .uri(mediaUrl)
+                        .headers(httpHeaders -> {
+                            httpHeaders.addAll(headers);
+                        })
+                        .exchangeToFlux(clientResponse -> clientResponse.body(BodyExtractors.toDataBuffers()))
+                        .map(DataBuffer::asInputStream)
+                        .reduce(SequenceInputStream::new);
+
+                AtomicReference<DocumentEntity> atomicDocument = new AtomicReference<>();
+                stream.doOnNext(inputStream -> {
+                    try {
+                        atomicDocument.set(fileStorageService.UploadDocumentStream(user, UUID.randomUUID().toString(), mediaContentType, inputStream));
+
+                        inputStream.close();
+                    } catch (IOException | MimeTypeException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).block().close();
+                //Es intencional que brinque el error aquí
+                assert atomicDocument.get() != null;
+
+                var document = atomicDocument.get();
+
+                content.setDocumentEntity(documentClassificationService.ClassifyDocument(document));
+                messageContentRepository.save(content);
             }
-
-            headers.add("Accept", mediaContentType);
-
-            var stream = WebClient.builder()
-                    .clientConnector(new ReactorClientHttpConnector(
-                            HttpClient.create().followRedirect(true)
-                    )).build().get()
-                    .uri(mediaUrl)
-                    .headers(httpHeaders -> {
-                        httpHeaders.addAll(headers);
-                    })
-                    .exchangeToFlux(clientResponse -> clientResponse.body(BodyExtractors.toDataBuffers()))
-                    .map(DataBuffer::asInputStream)
-                    .reduce(SequenceInputStream::new);
-
-            AtomicReference<DocumentEntity> atomicDocument = new AtomicReference<>();
-            stream.doOnNext(inputStream -> {
-                try {
-                    atomicDocument.set(fileStorageService.UploadDocumentStream(user, UUID.randomUUID().toString(), mediaContentType, inputStream));
-
-                    inputStream.close();
-                } catch (IOException | MimeTypeException e) {
-                    throw new RuntimeException(e);
-                }
-            }).block().close();
-            //Es intencional que brinque el error aquí
-            assert atomicDocument.get() != null;
-
-            var document = atomicDocument.get();
-
-            message.setDocumentEntity(documentClassificationService.ClassifyDocument(document));
         }
     }
 }

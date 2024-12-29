@@ -1,5 +1,6 @@
 package com.temis.app.state;
 
+import com.temis.app.entity.MessageContentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +18,27 @@ public class DocumentResponseState extends StateTemplate{
 
     @Override
     protected boolean ShouldTransition(MessageContextEntity message) {
-        return message.getDocumentEntity() != null;
+        return message.getMessageContents().stream().anyMatch(c -> c.getDocumentEntity() != null);
     }
 
     @Override
     protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
-        assert message.getDocumentEntity() != null;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (MessageContentEntity content : message.getMessageContents()) {
+            var document = content.getDocumentEntity();
 
-        var documentType = message.getDocumentEntity().getDocumentType();
+            if(document == null) continue;
 
-        if(documentType == null){
-            responseBuilder.body("null");
-            return;
+            var documentType = document.getDocumentType();
+
+            if(documentType == null){
+                stringBuilder.append("null?LL?");
+                continue;
+            }
+
+            stringBuilder.append(documentType.getName());
+            stringBuilder.append("?LL?");
         }
-
-        responseBuilder.body(documentType.getName());
+        responseBuilder.body(stringBuilder.toString());
     }
 }

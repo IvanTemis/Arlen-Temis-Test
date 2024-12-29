@@ -1,10 +1,15 @@
 package com.temis.app.state.with_service;
 
+import com.google.cloud.vertexai.api.Content;
+import com.google.cloud.vertexai.api.FileData;
+import com.google.cloud.vertexai.api.Part;
 import com.temis.app.entity.*;
 import com.temis.app.exception.JSONNotFoundException;
 import com.temis.app.model.ServiceStage;
+import com.temis.app.model.VertexAiRole;
 import com.temis.app.repository.StageContextRepository;
 import com.temis.app.service.ClientVirtualAssistantService;
+import com.temis.app.utils.VertexAIUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,26 +44,46 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
     @Override
     protected void ExecuteWithService(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user, ServiceEntity service) throws Exception {
-        if (message.getMediaUrl() == null && message.getBody().isEmpty()) {
+
+
+        int processed = 0;
+        var aiContentBuilder = Content.newBuilder().setRole(VertexAiRole.USER.name());
+        for (MessageContentEntity content : message.getMessageContents()) {
+            if(content.getDocumentEntity() == null && content.getBody().isEmpty()) continue;
+
+            String text = content.getBody();
+            if(text == null || text.isEmpty()){
+                text = "documento";
+
+                if(content.getDocumentEntity().getDocumentType() != null){
+                    text += " ";
+                    text += content.getDocumentEntity().getDocumentType().getName();
+                }
+
+                text += ":";
+            }
+
+            aiContentBuilder.addParts(Part.newBuilder().setText(text));
+
+            if(content.getDocumentEntity() != null) {
+                aiContentBuilder.addParts(Part.newBuilder().setFileData(
+                        FileData.newBuilder()
+                                .setMimeType(content.getDocumentEntity().getFileType())
+                                .setFileUri(content.getDocumentEntity().getPath())
+                ));
+            }
+
+            processed++;
+        }
+
+        if (processed == 0) {
             responseBuilder.body("Lo siento, no puedo procesar mensajes vacíos.");
             return;
         }
 
-        String text = message.getBody();
-        if(text == null || text.isEmpty()){
-            text = "documento";
-
-            if(message.getDocumentEntity() != null && message.getDocumentEntity().getDocumentType() != null){
-                text += " ";
-                text += message.getDocumentEntity().getDocumentType().getName();
-            }
-
-            text += ":";
-        }
-
         switch (service.getServiceStage()){
             case SOCIETY_IDENTIFICATION -> {
-                String result = clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user,ServiceStage.SOCIETY_IDENTIFICATION.getAgentId(),
+                String result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user,ServiceStage.SOCIETY_IDENTIFICATION.getAgentId(),
                         "\nContexto de la conversación:\n" +
                                 "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
                                 "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
@@ -74,7 +99,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
             case DOCUMENT_COLLECTION -> {
                 var stageContexts = stageContextRepository.findByServiceAndTargetStage(service, ServiceStage.DOCUMENT_COLLECTION).stream().map(StageContextEntity::getContext).toList();
 
-                String result = clientVirtualAssistantService.respondToUserMessage(text, message.getDocumentEntity(), user,ServiceStage.DOCUMENT_COLLECTION.getAgentId(),
+                String result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user,ServiceStage.DOCUMENT_COLLECTION.getAgentId(),
                         "\nContexto de la conversación:\n" +
                                 "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
                                 "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
@@ -89,7 +114,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 responseBuilder.body(result);
             }
             default -> {
-                throw new Exception("Estado inválido.");
+                throw new Exception("Estado " + service.getServiceStage().name() + " es inválido.");
             }
         }
 
