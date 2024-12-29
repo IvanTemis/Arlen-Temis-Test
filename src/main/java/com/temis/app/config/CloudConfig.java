@@ -3,6 +3,7 @@ package com.temis.app.config;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.client.VertexAIClient;
+import com.temis.app.client.GoogleCalendarClient;
 
 import java.io.IOException;
 
@@ -36,6 +37,13 @@ public class CloudConfig {
         return new CloudStorageClient(
                 cloudConfigProperties.getProjectId(),
                 cloudConfigProperties.getStorage().getBucketName()
+        );
+    }
+
+    @Bean
+    public GoogleCalendarClient googleCalendarClient() throws IOException {
+        return new GoogleCalendarClient(
+                cloudConfigProperties.getCalendar().getApplicationName()
         );
     }
 
