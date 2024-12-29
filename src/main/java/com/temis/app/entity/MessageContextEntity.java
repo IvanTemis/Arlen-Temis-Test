@@ -18,6 +18,8 @@ import static jakarta.persistence.EnumType.STRING;
 @Builder
 @Getter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "message_context")
 @NoArgsConstructor
 @AllArgsConstructor
