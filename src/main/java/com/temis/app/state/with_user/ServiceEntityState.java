@@ -67,7 +67,7 @@ public class ServiceEntityState extends  StateWithUserTemplate{
 
     @Override
     protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user)  {
-        responseBuilder.body("The Cake is a Lie");
+        responseBuilder.addContent("The Cake is a Lie");
     }
 
     @Override

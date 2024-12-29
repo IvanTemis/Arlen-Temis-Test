@@ -52,10 +52,12 @@ public class ExistingUserState extends StateTemplate{
             name = message.getUserEntity().getFirstName();
         }
 
-        responseBuilder.body(MessageFormat.format("¡Hola {0}! ¿En qué puedo ayudarte hoy?", name));
-        responseBuilder.quickActions(new ArrayList<>(){{
-            add(BeginDocumentCreationState.compraventa);
-        }});
+        responseBuilder.addContent(
+                MessageFormat.format("¡Hola {0}! ¿En qué puedo ayudarte hoy?", name),
+                new ArrayList<>(){{
+                    add(BeginDocumentCreationState.compraventa);
+                }}
+        );
     }
 
     @Override

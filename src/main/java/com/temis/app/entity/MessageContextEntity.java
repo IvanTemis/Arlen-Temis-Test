@@ -1,6 +1,5 @@
 package com.temis.app.entity;
 
-import com.temis.app.converter.JsonConverter;
 import com.temis.app.model.MessageSource;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,11 +8,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
-import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -42,7 +39,7 @@ public class MessageContextEntity {
     MessageSource messageSource;
 
     @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MessageContentEntity> messageContents;
+    private List<MessageContextContentEntity> messageContents;
 
     @Setter
     @Nullable
@@ -70,9 +67,26 @@ public class MessageContextEntity {
     boolean isActive = true;
 
     public List<String> getBodies(){
-        return messageContents.stream().map(c -> c.body).toList();
+        return messageContents.stream().map(MessageContextContentEntity::getBody).toList();
     }
     public List<DocumentEntity> getDocumentEntities(){
-        return messageContents.stream().map(c -> c.documentEntity).filter(Objects::nonNull).toList();
+        return messageContents.stream().map(MessageContextContentEntity::getDocumentEntity).filter(Objects::nonNull).toList();
+    }
+
+    public String getContentAsDebugString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (MessageContextContentEntity messageContent : messageContents) {
+            stringBuilder.append(messageContent.getBody()).append('\n');
+
+            if(messageContent.getDocumentEntity() != null){
+                stringBuilder.append('[').append(messageContent.getDocumentEntity().getFileType());
+                if(messageContent.getDocumentEntity().getDocumentType() != null){
+                    stringBuilder.append(':').append(messageContent.getDocumentEntity().getDocumentType().getName());
+                }
+                stringBuilder.append("]\n");;
+            }
+        }
+
+        return stringBuilder.toString();
     }
 }

@@ -9,11 +9,10 @@ import com.temis.app.model.ServiceStage;
 import com.temis.app.model.VertexAiRole;
 import com.temis.app.repository.StageContextRepository;
 import com.temis.app.service.ClientVirtualAssistantService;
-import com.temis.app.utils.VertexAIUtils;
+import com.temis.app.utils.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -48,7 +47,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
         int processed = 0;
         var aiContentBuilder = Content.newBuilder().setRole(VertexAiRole.USER.name());
-        for (MessageContentEntity content : message.getMessageContents()) {
+        for (MessageContextContentEntity content : message.getMessageContents()) {
             if(content.getDocumentEntity() == null && content.getBody().isEmpty()) continue;
 
             String text = content.getBody();
@@ -77,13 +76,15 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
         }
 
         if (processed == 0) {
-            responseBuilder.body("Lo siento, no puedo procesar mensajes vacíos.");
+            responseBuilder.addContent("Lo siento, no puedo procesar mensajes vacíos.");
             return;
         }
 
+        String result = "You shouldn't be here.";
+
         switch (service.getServiceStage()){
             case SOCIETY_IDENTIFICATION -> {
-                String result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user,ServiceStage.SOCIETY_IDENTIFICATION.getAgentId(),
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user,ServiceStage.SOCIETY_IDENTIFICATION.getAgentId(),
                         "\nContexto de la conversación:\n" +
                                 "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
                                 "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
@@ -94,12 +95,12 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     result = ExtractEndMessage(result, ServiceStage.SOCIETY_IDENTIFICATION, ServiceStage.DOCUMENT_COLLECTION, service);
                 }
 
-                responseBuilder.body(result);
+
             }
             case DOCUMENT_COLLECTION -> {
                 var stageContexts = stageContextRepository.findByServiceAndTargetStage(service, ServiceStage.DOCUMENT_COLLECTION).stream().map(StageContextEntity::getContext).toList();
 
-                String result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user,ServiceStage.DOCUMENT_COLLECTION.getAgentId(),
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user,ServiceStage.DOCUMENT_COLLECTION.getAgentId(),
                         "\nContexto de la conversación:\n" +
                                 "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
                                 "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
@@ -110,15 +111,17 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 if(result.contains(END_STAGE_1)){
                     result = ExtractEndMessage(result, ServiceStage.DOCUMENT_COLLECTION, ServiceStage.COMPANY_INCORPORATION, service);
                 }
-
-                responseBuilder.body(result);
             }
             default -> {
                 throw new Exception("Estado " + service.getServiceStage().name() + " es inválido.");
             }
         }
 
+        var sentences = TextUtils.splitIntoSentences(result);
 
+        for (String sentence : sentences) {
+            responseBuilder.addContent(sentence);
+        }
     }
 
     private String ExtractEndMessage(String message, ServiceStage current, ServiceStage next, ServiceEntity service) throws JSONNotFoundException {

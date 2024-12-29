@@ -11,10 +11,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Builder
+@Builder( buildMethodName = "hiddenBuild")
 @Getter
 @Entity
 @Table(name = "message_response")
@@ -30,24 +31,17 @@ public class MessageResponseEntity {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String body;
-
-    @Convert(converter = StringListConverter.class)
-    @Column(nullable = true, columnDefinition = "TEXT")
-    private List<String> quickActions;
-
-    @Column(nullable = true, columnDefinition = "TEXT")
-    URI mediaURL;
+    @OneToMany(mappedBy = "response", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MessageResponseContentEntity> responseContents;
 
     @Nullable
     @JoinColumn(nullable = true, updatable = false)
     @ManyToOne(optional = true, targetEntity = UserEntity.class)
-    UserEntity userEntity;
+    private UserEntity userEntity;
 
     @JoinColumn(nullable = false, updatable = false, name = "message_context_id")
     @ManyToOne(optional = false, targetEntity = MessageContextEntity.class)
-    MessageContextEntity messageContextEntity;
+    private MessageContextEntity messageContextEntity;
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -56,5 +50,56 @@ public class MessageResponseEntity {
 
     @Nullable
     @Column(nullable = true, updatable = false, columnDefinition = "TEXT")
-    String exception;
+    private String exception;
+
+    public String getContentAsDebugString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (var responseContent : responseContents) {
+            stringBuilder.append(responseContent.getBody()).append('\n');
+
+            if(responseContent.getMediaURL() != null){
+                stringBuilder.append('[').append(responseContent.getMediaURL()).append("]\n");
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+
+    public static class MessageResponseEntityBuilder {
+        public MessageResponseEntityBuilder addContent(String body, URI mediaURL, List<String> quickActions) {
+            if(responseContents == null){
+                this.responseContents = new ArrayList<>();
+            }
+
+            this.responseContents.add(MessageResponseContentEntity.builder()
+                    .body(body)
+                    .mediaURL(mediaURL)
+                    .quickActions(quickActions)
+                    .build());
+
+            return this;
+        }
+        public MessageResponseEntityBuilder addContent(String body, List<String> quickActions){
+            return addContent(body, null, quickActions);
+        }
+
+        public MessageResponseEntityBuilder addContent(String body, URI mediaURL){
+            return addContent(body, mediaURL, null);
+        }
+
+        public MessageResponseEntityBuilder addContent(String body){
+            return addContent(body, null, null);
+        }
+
+        public MessageResponseEntity build(){
+            var result = this.hiddenBuild();
+
+            for (MessageResponseContentEntity responseContent : result.responseContents) {
+                responseContent.setResponse(result);
+            }
+
+            return result;
+        }
+    }
 }

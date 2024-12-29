@@ -1,6 +1,7 @@
 package com.temis.app.service.impl;
 
 import com.temis.app.config.properties.TwilioConfigProperties;
+import com.temis.app.entity.MessageResponseContentEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.service.MessagePlatformService;
 import com.temis.app.utils.TextUtils;
@@ -30,24 +31,20 @@ public class TwilioMessageService implements MessagePlatformService {
     @Override
     public void sendMessage(MessageResponseEntity response) {
         try {
-            List<String> sentences = TextUtils.splitIntoSentences(response.getBody());
-            for (int i = 0; i < sentences.size(); i++) {
-                String sentence = sentences.get(i).trim();
-
-                if(sentence.isEmpty()) continue;
+            for (MessageResponseContentEntity content : response.getResponseContents()) {
 
                 var message = Message.creator(
                         new PhoneNumber("whatsapp:" + response.getPhoneNumber()),
                         new PhoneNumber(twilioConfigProperties.phoneNumber()),
-                        sentence
+                        content.getBody()
                 );
 
-                if (response.getMediaURL() != null && i == 0) {
-                    message.setMediaUrl(response.getMediaURL());
+                if (content.getMediaURL() != null) {
+                    message.setMediaUrl(content.getMediaURL());
                 }
 
                 message.create();
-                log.info("Mensaje enviado a {}: {}", response.getPhoneNumber(), sentence);
+                log.info("Mensaje enviado a {}: {} {}", response.getPhoneNumber(), content.getBody(), content.getMediaURL());
 
                 Thread.sleep(2000);
             }

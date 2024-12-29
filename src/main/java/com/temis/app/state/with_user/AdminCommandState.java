@@ -54,7 +54,6 @@ public class AdminCommandState extends  StateWithUserTemplate{
 
     @Override
     protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws IOException, MessagingException {
-        StringBuilder stringBuilder = new StringBuilder();
         for (var content : message.getMessageContents()) {
             var split = content.getBody().toLowerCase().split(" ");
 
@@ -75,7 +74,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
 
                     serviceEntityService.deactivateServicesForUser(user);
 
-                    stringBuilder.append("Contexto historico del agente limpiado.");
+                    responseBuilder.addContent("Contexto historico del agente limpiado.");
                 }
                 break;
                 case "!fetchprompt":
@@ -85,7 +84,8 @@ public class AdminCommandState extends  StateWithUserTemplate{
                         agent.UpdatePrompt();
                     }
                     documentClassifierClient.UpdatePrompt();
-                    stringBuilder.append("Prompts actualizados exitosamente.");
+
+                    responseBuilder.addContent("Prompts actualizados exitosamente.");
                 }
                 break;
                 case "!emailtest": {
@@ -93,7 +93,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
                     var email = user.getEmail();
 
                     if (email == null) {
-                        stringBuilder.append("Disculpa, no puedo enviarte este correo porque no tienes un correo asignado.");
+                        responseBuilder.addContent("Disculpa, no puedo enviarte este correo porque no tienes un correo asignado.");
                         break;
                     }
 
@@ -107,7 +107,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
                         emailService.SendSimpleEmail(email, "TEST", emailBody);
                     }
 
-                    stringBuilder.append("Email de prueba enviado a tu correo.");
+                    responseBuilder.addContent("Email de prueba enviado a tu correo.");
                 }
                 break;
                 case "!resend": {
@@ -116,25 +116,23 @@ public class AdminCommandState extends  StateWithUserTemplate{
                     var resend = messageResponseRepository.findById(id);
 
                     if (resend.isEmpty()) {
-                        stringBuilder.append("Respuesta con ID ").append(id).append(" no encontrada.");
+                        responseBuilder.addContent("Respuesta con ID " + id + " no encontrada.");
                         break;
                     }
 
                     var resp = resend.get();
 
-                    responseBuilder
-                            .body(resp.getBody())
-                            .mediaURL(resp.getMediaURL());
-                    return; //TODO: Modificar cuando se puedan enviar múltiples respuestas en un solo mensaje.
+                    for (MessageResponseContentEntity c : resp.getResponseContents()) {
+                        responseBuilder.addContent(c.getBody(), c.getMediaURL(), c.getQuickActions());
+                    }
                 }
-                //break;
+                break;
                 default:
-                    stringBuilder.append("Disculpa, no reconozco ese comando.");
+                    responseBuilder.addContent("Disculpa, no reconozco ese comando.");
                     break;
             }
-            stringBuilder.append("?LL?");
         }
 
-        responseBuilder.body(stringBuilder.toString());
+
     }
 }

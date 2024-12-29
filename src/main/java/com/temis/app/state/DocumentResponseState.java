@@ -1,6 +1,6 @@
 package com.temis.app.state;
 
-import com.temis.app.entity.MessageContentEntity;
+import com.temis.app.entity.MessageContextContentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +23,7 @@ public class DocumentResponseState extends StateTemplate{
 
     @Override
     protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (MessageContentEntity content : message.getMessageContents()) {
+        for (MessageContextContentEntity content : message.getMessageContents()) {
             var document = content.getDocumentEntity();
 
             if(document == null) continue;
@@ -32,13 +31,11 @@ public class DocumentResponseState extends StateTemplate{
             var documentType = document.getDocumentType();
 
             if(documentType == null){
-                stringBuilder.append("null?LL?");
+                responseBuilder.addContent("null");
                 continue;
             }
 
-            stringBuilder.append(documentType.getName());
-            stringBuilder.append("?LL?");
+            responseBuilder.addContent(documentType.getName());
         }
-        responseBuilder.body(stringBuilder.toString());
     }
 }

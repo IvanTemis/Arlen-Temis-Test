@@ -30,9 +30,7 @@ public class BeginDocumentCreationState extends  StateWithUserTemplate{
     protected void ExecuteWithUser(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user) throws URISyntaxException {
 
         assert user.getEmployee() != null;
-        responseBuilder.body("*No hace nada*");
-
-        responseBuilder.mediaURL(new URI("https://images7.memedroid.com/images/UPLOADED213/63f303757e38e.jpeg"));
+        responseBuilder.addContent("*No hace nada*", new URI("https://images7.memedroid.com/images/UPLOADED213/63f303757e38e.jpeg"));
 
     }
 }

@@ -1,9 +1,9 @@
 package com.temis.app.controller;
 
-import com.temis.app.entity.MessageContentEntity;
+import com.temis.app.entity.MessageContextContentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.model.MessageSource;
-import com.temis.app.repository.MessageContentRepository;
+import com.temis.app.repository.MessageContextContentRepository;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.service.MessageProcessingService;
 import com.temis.app.service.MessageService;
@@ -30,7 +30,7 @@ public class WhatsappBotController {
 
     @Autowired
     private MessageContextRepository messageContextRepository;
-    private MessageContentRepository messageContentRepository;
+    private MessageContextContentRepository messageContextContentRepository;
 
     @PostMapping("/webhook")
     public void receiveWhatsAppMessage(@RequestParam Map<String, String> requestBody) {
@@ -59,7 +59,7 @@ public class WhatsappBotController {
             messageContextRepository.save(context);
         }
 
-        var contentBuilder = MessageContentEntity.builder()
+        var contentBuilder = MessageContextContentEntity.builder()
                 .context(context)
                 .messageId("twilio:" + SmsMessageSid)
                 .body(userMessage)
@@ -72,7 +72,7 @@ public class WhatsappBotController {
 
         }
 
-        messageContentRepository.save(contentBuilder.build());
+        messageContextContentRepository.save(contentBuilder.build());
         messageProcessingService.scheduleMessageProcessing(phoneNumber);
     }
 }

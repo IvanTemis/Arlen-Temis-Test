@@ -1,14 +1,11 @@
 package com.temis.app.state.with_user;
 
-import com.temis.app.client.DocumentClassifierClient;
 import com.temis.app.config.properties.TwilioConfigProperties;
 import com.temis.app.entity.DocumentEntity;
-import com.temis.app.entity.MessageContentEntity;
+import com.temis.app.entity.MessageContextContentEntity;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.UserEntity;
-import com.temis.app.repository.DocumentTypeRepository;
-import com.temis.app.repository.MessageContentRepository;
-import com.temis.app.repository.MessageContextRepository;
+import com.temis.app.repository.MessageContextContentRepository;
 import com.temis.app.service.DocumentClassificationService;
 import com.temis.app.service.FileStorageService;
 import org.apache.tika.mime.MimeTypeException;
@@ -17,7 +14,6 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -40,11 +36,11 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
     @Autowired
     private DocumentClassificationService documentClassificationService;
     @Autowired
-    private MessageContentRepository messageContentRepository;
+    private MessageContextContentRepository messageContextContentRepository;
 
     @Override
     protected void Intransitable(MessageContextEntity message, UserEntity user) throws Exception {
-        for (MessageContentEntity content : message.getMessageContents()) {
+        for (MessageContextContentEntity content : message.getMessageContents()) {
             if(content.getMediaUrl() != null){
                 var mediaUrl = content.getMediaUrl();
                 var mediaContentType = content.getMediaContentType();
@@ -96,7 +92,7 @@ public class ProcessFileIntransitableState extends IntransitableWithUserStateTem
                 var document = atomicDocument.get();
 
                 content.setDocumentEntity(documentClassificationService.ClassifyDocument(document));
-                messageContentRepository.save(content);
+                messageContextContentRepository.save(content);
             }
         }
     }

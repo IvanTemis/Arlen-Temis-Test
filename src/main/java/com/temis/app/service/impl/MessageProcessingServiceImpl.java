@@ -52,11 +52,11 @@ public class MessageProcessingServiceImpl implements MessageProcessingService {
 
         var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreateDateAsc(phoneNumber);
 
-        log.info("Procesando {} mensaje/s acumulados de {}", context.getMessageContents().size(), phoneNumber);
+        log.info("Procesando {} mensaje/s acumulados de {}: {}", context.getMessageContents().size(), phoneNumber, context.getContentAsDebugString());
     
         MessageResponseEntity response = firstContactState.Evaluate(context);
     
-        log.info("Respuesta generada para {}: {}", phoneNumber, response.getBody());
+        log.info("Se generaron {} respuestas para {}: {}", response.getResponseContents().size(), phoneNumber, response.getContentAsDebugString());
     
         messageService.sendResponseToUser(response);
     }

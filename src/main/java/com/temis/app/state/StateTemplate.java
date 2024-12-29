@@ -67,7 +67,7 @@ public abstract class StateTemplate {
                     .phoneNumber(message.getPhoneNumber())
                     .userEntity(message.getUserEntity())
                     .exception(exception.toString())
-                    .body(exceptionMessage);
+                    .addContent(exceptionMessage);
             log.error("An error occurred during state evaluation", exception);
         }
 
