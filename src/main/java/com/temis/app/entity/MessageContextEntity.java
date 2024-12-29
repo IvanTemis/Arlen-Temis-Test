@@ -8,8 +8,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
-import java.net.URI;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
@@ -17,14 +15,14 @@ import static jakarta.persistence.EnumType.STRING;
 
 @Builder
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "message_context")
-@NoArgsConstructor
-@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class MessageContextEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
@@ -34,50 +32,44 @@ public class MessageContextEntity {
     private String messageId;
 
     @Column(nullable = false)
-    String phoneNumber;
+    private String phoneNumber;
 
     @Column(nullable = false)
-    String nickName;
+    private String nickName;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    String body;
+    private String body;
 
     @Nullable
-    @Column(nullable = true, columnDefinition = "TEXT")
-    String mediaUrl;
+    @Column(columnDefinition = "TEXT")
+    private String mediaUrl;
 
     @Nullable
-    @Column(nullable = true)
-    String mediaContentType;
+    @Column
+    private String mediaContentType;
 
-    @Column(nullable = false)
     @Enumerated(STRING)
-    MessageSource messageSource;
+    @Column(nullable = false)
+    private MessageSource messageSource;
 
-    @Column(nullable = false, columnDefinition = "text")
     @Convert(converter = JsonConverter.class)
-    Map<String, Object> request;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private Map<String, Object> request;
 
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "document_id")
-    @ManyToOne(optional = true, targetEntity = DocumentEntity.class)
-    DocumentEntity documentEntity;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "document_id")
+    private DocumentEntity documentEntity;
 
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "user_id")
-    @ManyToOne(optional = true, targetEntity = UserEntity.class)
-    UserEntity userEntity;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
 
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "service_id")
-    @ManyToOne(optional = true, targetEntity = ServiceEntity.class)
-    ServiceEntity serviceEntity;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "service_id")
+    private ServiceEntity serviceEntity;
 
-    @Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
     private Date createdDate;
 }
