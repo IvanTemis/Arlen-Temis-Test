@@ -28,6 +28,9 @@ steps:
         echo "whatsappapi.businessAccountId=$(gcloud secrets versions access
         latest --secret=whatsappapi_businessAccountId)" >> secrets.properties
 
+        echo "whatsappapi.verifyToken=$(gcloud secrets versions access latest
+        --secret=whatsappapi_verifyToken)" >> secrets.properties
+
         echo "twilio.accountSid=$(gcloud secrets versions access latest
         --secret=twilio_accountSid)" >> secrets.properties
 
@@ -48,16 +51,19 @@ steps:
 
         echo "cloud.storage.bucketName=$(gcloud secrets versions access latest
         --secret=cloud_storage_bucketName)" >> secrets.properties
-        
+
+        echo "cloud.calendar.applicationName=$(gcloud secrets versions access latest
+        --secret=cloud_calendar_applicationName)" >> secrets.properties
+
         echo "spring.mail.host=$(gcloud secrets versions access latest
         --secret=spring_mail_host)" >> secrets.properties
-        
+
         echo "spring.mail.port=$(gcloud secrets versions access latest
         --secret=spring_mail_port)" >> secrets.properties
-        
+
         echo "spring.mail.username=$(gcloud secrets versions access latest
         --secret=spring_mail_username)" >> secrets.properties
-        
+
         echo "spring.mail.password=$(gcloud secrets versions access latest
         --secret=spring_mail_password)" >> secrets.properties
     entrypoint: bash
