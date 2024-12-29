@@ -17,47 +17,46 @@ import static jakarta.persistence.EnumType.STRING;
 
 @Builder
 @Getter
-@Entity
-@Table(name = "message_context")
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "message_context")
 @EntityListeners(AuditingEntityListener.class)
 public class MessageContextEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
 
     @Column(nullable = false)
-    String phoneNumber;
+    private String phoneNumber;
 
     @Column(nullable = false)
-    String nickName;
+    private String nickName;
 
     @Column(nullable = false)
     @Enumerated(STRING)
-    MessageSource messageSource;
+    @Column(nullable = false)
+    private MessageSource messageSource;
 
 
     @OrderBy("createdDate")
     @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     private List<MessageContextContentEntity> messageContents;
 
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "user_id")
-    @ManyToOne(optional = true, targetEntity = UserEntity.class)
-    UserEntity userEntity;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
 
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "service_id")
-    @ManyToOne(optional = true, targetEntity = ServiceEntity.class)
-    ServiceEntity serviceEntity;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "service_id")
+    private ServiceEntity serviceEntity;
 
-    @Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
     private Date createdDate;
 
     @Column(nullable = false)
