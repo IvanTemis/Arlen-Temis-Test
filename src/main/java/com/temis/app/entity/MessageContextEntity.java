@@ -35,8 +35,7 @@ public class MessageContextEntity {
 
     @Column(nullable = false)
     private String nickName;
-
-    @Column(nullable = false)
+    
     @Enumerated(STRING)
     @Column(nullable = false)
     private MessageSource messageSource;
