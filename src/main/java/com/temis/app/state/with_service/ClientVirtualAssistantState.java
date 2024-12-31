@@ -144,7 +144,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
             result = result.replace(json, "").replace("```json", "").replace("```", "").trim();
         }
         else{
-            throw new JSONNotFoundException("Se intentó finalizar la etapa SOCIETY_IDENTIFICATION del agente pero no se encontró un JSON válido");
+            throw new JSONNotFoundException("Se intentó finalizar la etapa " + current.name() + " del agente pero no se encontró un JSON válido");
         }
 
         return result;
