@@ -19,12 +19,10 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-
     private MimeMessageHelper HTMLEmailTemplate(MimeMessage message, String to, String body) throws MessagingException {
         var helper = new MimeMessageHelper(message, true);
         helper.setTo(to);
         helper.setText(body, true);
-
         return helper;
     }
 
@@ -44,10 +42,21 @@ public class EmailServiceImpl implements EmailService {
     @SafeVarargs
     @Override
     public final void SendHtmlEmailWithAttachments(String to, String subject, String body, Pair<String, ByteArrayResource>... attachments) throws MessagingException {
+        SendHtmlEmailWithAttachments(to, subject, body, null, attachments);
+    }
+
+    @Override
+    public final void SendHtmlEmailWithAttachments(String to, String subject, String body, String[] bcc, Pair<String, ByteArrayResource>... attachments) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
 
         message.setSubject(subject);
-        MimeMessageHelper helper = HTMLEmailTemplate(message, to, body);
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(to);
+        if (bcc != null && bcc.length > 0) {
+            helper.setBcc(bcc);
+        }
+        helper.setText(body, true);
 
         for (Pair<String, ByteArrayResource> attachment : attachments) {
             helper.addAttachment(attachment.getFirst(), attachment.getSecond());
@@ -55,7 +64,7 @@ public class EmailServiceImpl implements EmailService {
 
         mailSender.send(message);
 
-        log.info("HTML email with attachments sent to {}", to);
+        log.info("HTML email with attachments sent to {} with BCC: {}", to, bcc != null ? String.join(", ", bcc) : "None");
     }
 
     @Override

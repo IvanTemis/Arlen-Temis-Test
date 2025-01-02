@@ -9,7 +9,6 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-
 @Service
 @Slf4j
 public class DraftEmailService {
@@ -18,17 +17,25 @@ public class DraftEmailService {
     private EmailService emailService; 
 
     public void sendDraftByEmail(String draftText, String emailAddress) throws Exception {
-        
         WordDocumentFormatter formatter = new WordDocumentFormatter();
-        byte[] documentBytes = formatter.createFormattedDocument(draftText);
-        
+
+        byte[] wordBytes = formatter.createFormattedDocument(draftText);
+        byte[] pdfBytes = formatter.createPDFDocument(draftText);
+
         String subject = "Borrador de alta constitutiva";
-        String body = "Adjunto encontrarás el borrador de la alta constitutiva.";
-        Pair<String, ByteArrayResource> attachment = Pair.of("Borrador.docx", new ByteArrayResource(documentBytes));
+        String body = "Adjunto encontrarás el borrador de la alta constitutiva en formatos Word y PDF.";
 
-        //emailService.SendHtmlEmailWithAttachments(emailAddress, subject, body, attachment);
-        emailService.SendHtmlEmailWithAttachments("ivan.cantu.garcia@gmail.com", subject, body, attachment);
+        Pair<String, ByteArrayResource> wordAttachment = Pair.of("Borrador.docx", new ByteArrayResource(wordBytes));
+        Pair<String, ByteArrayResource> pdfAttachment = Pair.of("Borrador.pdf", new ByteArrayResource(pdfBytes));
 
-        log.info("Borrador enviado a {}", emailAddress);
+        String[] bccAddresses = {
+            "ivan@temislegal.ai",
+            "alex@temislegal.ai",
+            "diego@temislegal.ai",
+            "gabriel@temislegal.ai"
+        };
+
+        emailService.SendHtmlEmailWithAttachments(emailAddress, subject, body, bccAddresses, wordAttachment, pdfAttachment);
+        log.info("Borrador enviado a {} con adjuntos Word y PDF, copia oculta a: {}", emailAddress, String.join(", ", bccAddresses));
     }
 }

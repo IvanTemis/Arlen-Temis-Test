@@ -123,14 +123,21 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     String startDateTime = java.time.LocalDateTime.now().plusDays(1).toString();
                     String endDateTime = java.time.LocalDateTime.now().plusDays(1).plusHours(1).toString();
 
+                    String[] additionalAttendees = {
+                        "ivan@temislegal.ai",
+                        "alex@temislegal.ai",
+                        "diego@temislegal.ai",
+                        "gabriel@temislegal.ai"
+                    };
+
                     Event event = calendarClient.createEvent(
-                            "primary",
+                            "ivan.cantu.garcia@gmail.com",
                             "Revisión del Borrador de Alta Constitutiva",
-                            "Revisar el borrador de alta constitutiva:\n" + draft,
+                            "Revisar el borrador de alta constitutiva",
                             "Virtual (Zoom/Google Meet)",
                             startDateTime,
                             endDateTime,
-                            new String[]{user.getEmail()}
+                            additionalAttendees
                     );
 
                     log.info("Evento creado en el calendario: {}", event.getHtmlLink());
