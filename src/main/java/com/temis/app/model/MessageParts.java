@@ -1,11 +1,15 @@
 package com.temis.app.model;
 
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MessageParts {
+    @Getter
     private String text;
+    @Getter
     private String json;
     private Map<String, String> metadata; // Para futuros datos adicionales
 
@@ -13,14 +17,6 @@ public class MessageParts {
         this.text = text;
         this.json = json;
         this.metadata = new HashMap<>();
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public String getJson() {
-        return json;
     }
 
     public void addMetadata(String key, String value) {
