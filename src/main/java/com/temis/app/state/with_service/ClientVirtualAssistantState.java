@@ -94,7 +94,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, ServiceStage.SOCIETY_IDENTIFICATION, ServiceStage.DOCUMENT_COLLECTION, service);
-                    HandleExtractedMessage(responseBuilder, messageParts);
+                    result = messageParts.getText();
                 }
             }
             case DOCUMENT_COLLECTION -> {
@@ -112,7 +112,8 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, ServiceStage.DOCUMENT_COLLECTION, ServiceStage.COMPANY_INCORPORATION, service);
-                    
+                    result = messageParts.getText();
+
                     //Generamos el borrador de alta constitutiva
                     String draft = clientVirtualAssistantService.generateCompanyIncorporationDraft(messageParts.getJson(), user);
                     log.info("Borrador generado: {}", draft);
@@ -134,11 +135,15 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     );
 
                     log.info("Evento creado en el calendario: {}", event.getHtmlLink());
-
-                    HandleExtractedMessage(responseBuilder, messageParts);
                 }
             }
             default -> throw new Exception("Estado " + service.getServiceStage().name() + " es inválido.");
+        }
+
+        //Este código se encarga de construir las respuestas al usuario. Tiene que ser ejecutado por cada ejecución de este método o no va a responder nada.
+        var sentences = TextUtils.splitIntoSentences(result);
+        for (String sentence : sentences) {
+            responseBuilder.addContent(sentence);
         }
     }
 
@@ -151,7 +156,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
         String extractedJson = null;
 
         if (matcher.find()) {
-            extractedJson = matcher.group(1).replace("```json", "").replace("```", "").trim();
+            extractedJson = matcher.group(1).trim();
 
             log.info("Se finalizó {} con JSON: {}", current, extractedJson);
 
@@ -159,21 +164,12 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     null, current, next, extractedJson, null, true, service);
             stageContextRepository.save(stageContext);
 
-            result = result.replace(matcher.group(1), "").trim();
+            result = result.replace(extractedJson, "").replace("```json", "").replace("```", "").trim();
         } else {
             throw new JSONNotFoundException("Se intentó finalizar la etapa " + current.name() +
                     " del agente pero no se encontró un JSON válido");
         }
 
         return new MessageParts(result, extractedJson);
-    }
-
-    private void HandleExtractedMessage(MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, MessageParts messageParts) {
-        var sentences = TextUtils.splitIntoSentences(messageParts.getText());
-        for (String sentence : sentences) {
-            responseBuilder.addContent(sentence);
-        }
-
-        log.info("JSON extraído: {}", messageParts.getJson());
     }
 }
