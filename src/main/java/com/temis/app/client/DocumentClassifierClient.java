@@ -85,7 +85,7 @@ public class DocumentClassifierClient {
 
         var content = VertexAIUtils.ContentWithDocument("Clasifica este documento", gsUrl, mimeType);
 
-        return VertexAIUtils.ExponentialBackoff(10,100,10000,() -> {
+        return VertexAIUtils.ExponentialBackoff(10,1000,10000,() -> {
             try {
                 return chatSession.sendMessage(content);
             } catch (IOException e) {

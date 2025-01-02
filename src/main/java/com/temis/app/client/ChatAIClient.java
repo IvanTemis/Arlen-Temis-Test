@@ -81,7 +81,7 @@ public class ChatAIClient {
 
         if(history != null) chatSession.setHistory(history);
 
-        return VertexAIUtils.ExponentialBackoff(10,100,10000,() -> {
+        return VertexAIUtils.ExponentialBackoff(10,1000,10000,() -> {
             try {
                 return chatSession.sendMessage(message);
             } catch (IOException e) {
@@ -95,7 +95,7 @@ public class ChatAIClient {
     
         ChatSession chatSession = model.startChat();
     
-        return VertexAIUtils.ExponentialBackoff(10, 100, 10000, () -> {
+        return VertexAIUtils.ExponentialBackoff(10, 1000, 10000, () -> {
             try {
                 return chatSession.sendMessageStream(message);
             } catch (IOException e) {
