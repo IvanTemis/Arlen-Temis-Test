@@ -40,7 +40,6 @@ public class MessageContextEntity {
     @Column(nullable = false)
     private MessageSource messageSource;
 
-
     @OrderBy("createdDate")
     @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
     private List<MessageContextContentEntity> messageContents;

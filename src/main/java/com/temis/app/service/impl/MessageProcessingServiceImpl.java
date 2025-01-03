@@ -48,7 +48,13 @@ public class MessageProcessingServiceImpl implements MessageProcessingService {
 
     private void processAccumulatedMessages(String phoneNumber) throws Exception {
 
+        //TODO: Qué pasa si a 2 números diferentes (Twilio/Meta) del mismo número??
         var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber);
+
+        if(context == null){
+            log.warn("Contexto nulo para llamada de procecamiento de mensajes del número {}", phoneNumber);
+            return;
+        }
 
         log.info("Procesando {} mensaje/s acumulados de {}: {}", context.getMessageContents().size(), phoneNumber, context.getContentAsDebugString());
     

@@ -28,8 +28,8 @@ public class TwilioMessageService implements MessagePlatformService {
     }
 
     @Override
-    public void sendMessage(MessageResponseEntity response) {
-        try {
+    public void sendMessage(MessageResponseEntity response) throws InterruptedException {
+
             if (response.getPhoneNumber() == null || response.getPhoneNumber().isEmpty()) {
                 log.error("El número de teléfono es nulo o vacío. No se enviará el mensaje.");
                 return;
@@ -60,10 +60,7 @@ public class TwilioMessageService implements MessagePlatformService {
 
                 Thread.sleep(2000);
             }
-        } catch (Exception e) {
-            log.error("Error al enviar mensaje a {}: {}", response.getPhoneNumber(), e.getMessage(), e);
         }
-    }
 
     private boolean isValidUrl(URI uri) {
         try {

@@ -18,7 +18,7 @@ public class MessageServiceImpl implements MessageService {
     private Map<MessageSource, MessagePlatformService> platformServices;
 
     @Override
-    public void sendResponseToUser(MessageResponseEntity response) {
+    public void sendResponseToUser(MessageResponseEntity response) throws InterruptedException {
         MessageSource source = response.getMessageContextEntity().getMessageSource();
 
         MessagePlatformService platformService = platformServices.get(source);
