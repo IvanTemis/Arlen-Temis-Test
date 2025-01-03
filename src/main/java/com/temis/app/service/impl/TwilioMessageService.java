@@ -30,37 +30,37 @@ public class TwilioMessageService implements MessagePlatformService {
     @Override
     public void sendMessage(MessageResponseEntity response) throws InterruptedException {
 
-            if (response.getPhoneNumber() == null || response.getPhoneNumber().isEmpty()) {
-                log.error("El número de teléfono es nulo o vacío. No se enviará el mensaje.");
-                return;
+        if (response.getPhoneNumber() == null || response.getPhoneNumber().isEmpty()) {
+            log.error("El número de teléfono es nulo o vacío. No se enviará el mensaje.");
+            return;
+        }
+
+        for (MessageResponseContentEntity content : response.getResponseContents()) {
+            if (content.getBody() == null || content.getBody().isEmpty()) {
+                log.error("El cuerpo del mensaje es nulo o vacío. No se enviará el mensaje a {}.", response.getPhoneNumber());
+                continue;
             }
 
-            for (MessageResponseContentEntity content : response.getResponseContents()) {
-                if (content.getBody() == null || content.getBody().isEmpty()) {
-                    log.error("El cuerpo del mensaje es nulo o vacío. No se enviará el mensaje a {}.", response.getPhoneNumber());
-                    continue;
-                }
+            if (content.getMediaURL() != null && !isValidUrl(content.getMediaURL())) {
+                log.error("La URL de medios no es válida: {}. No se incluirá en el mensaje a {}.", content.getMediaURL(), response.getPhoneNumber());
+            }
 
-                if (content.getMediaURL() != null && !isValidUrl(content.getMediaURL())) {
-                    log.error("La URL de medios no es válida: {}. No se incluirá en el mensaje a {}.", content.getMediaURL(), response.getPhoneNumber());
-                }
-
-                var messageCreator = Message.creator(
+            var messageCreator = Message.creator(
                     new PhoneNumber("whatsapp:" + response.getPhoneNumber()),
                     new PhoneNumber(twilioConfigProperties.phoneNumber()),
                     content.getBody()
-                );
+            );
 
-                if (content.getMediaURL() != null && isValidUrl(content.getMediaURL())) {
-                    messageCreator.setMediaUrl(content.getMediaURL());
-                }
-
-                messageCreator.create();
-                log.info("Mensaje enviado a {}: {} {}", response.getPhoneNumber(), content.getBody(), content.getMediaURL());
-
-                Thread.sleep(2000);
+            if (content.getMediaURL() != null && isValidUrl(content.getMediaURL())) {
+                messageCreator.setMediaUrl(content.getMediaURL());
             }
+
+            messageCreator.create();
+            log.info("Mensaje enviado a {}: {} {}", response.getPhoneNumber(), content.getBody(), content.getMediaURL());
+
+            Thread.sleep(2000);
         }
+    }
 
     private boolean isValidUrl(URI uri) {
         try {
