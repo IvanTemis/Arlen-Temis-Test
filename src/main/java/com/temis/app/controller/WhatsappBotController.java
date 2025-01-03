@@ -85,14 +85,14 @@ public class WhatsappBotController {
 
         if(!result.isEmpty()) return;
 
-        var phoneNumber = message.from();
+        var phoneNumber = "+" + message.from();
         var nickName = message.contacts() != null ? message.contacts().get(0).profile().name() : "UNKNOWN";
 
         var context = messageContextRepository.findFirstByPhoneNumberAndMessageSourceAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber, MessageSource.META);
 
         if (context == null) {
             context = MessageContextEntity.builder()
-                    .phoneNumber("+" + phoneNumber)
+                    .phoneNumber(phoneNumber)
                     .nickName(nickName)
                     .messageSource(MessageSource.META)
                     .isActive(true)
