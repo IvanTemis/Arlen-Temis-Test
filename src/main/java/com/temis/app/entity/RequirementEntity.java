@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.sql.Timestamp;
 
@@ -15,6 +16,7 @@ import static jakarta.persistence.EnumType.STRING;
 @Builder(builderMethodName = "hiddenBuilder")
 @Entity
 @Table(name = "requirement")
+@EntityListeners(AuditingEntityListener.class)
 public class RequirementEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,9 +30,9 @@ public class RequirementEntity {
     @Column(nullable = false)
     private Boolean isCompleted = false;
 
+    @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    @ManyToOne(optional = false, targetEntity = ServiceEntity.class)
-    ServiceEntity serviceEntity;
+    private ServiceEntity serviceEntity;
 
     @JoinColumn(nullable = true, name = "document_id")
     @OneToOne(optional = true, targetEntity = DocumentEntity.class)

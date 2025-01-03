@@ -1,71 +1,92 @@
 package com.temis.app.entity;
 
-import com.temis.app.converter.JsonConverter;
 import com.temis.app.model.MessageSource;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
-import java.net.URI;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Map;
+import java.util.List;
+import java.util.Objects;
 
 import static jakarta.persistence.EnumType.STRING;
 
 @Builder
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "message_context")
 @EntityListeners(AuditingEntityListener.class)
-@AllArgsConstructor 
 public class MessageContextEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(unique = true, nullable = false)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String messageId;
+    @Column(nullable = false)
+    private String phoneNumber;
 
     @Column(nullable = false)
-    String phoneNumber;
-
-    @Column(nullable = false)
-    String nickName;
-
-    @Column(nullable = false, columnDefinition = "TEXT")
-    String body;
-
-    @Nullable
-    @Setter
-    @Column(nullable = true, columnDefinition = "TEXT")
-    String mediaUrl;
-
-    @Nullable
-    @Column(nullable = true)
-    String mediaContentType;
-
-    @Column(nullable = false)
+    private String nickName;
+    
     @Enumerated(STRING)
-    MessageSource messageSource;
+    @Column(nullable = false)
+    private MessageSource messageSource;
 
-    @Column(nullable = false, columnDefinition = "text")
-    @Convert(converter = JsonConverter.class)
-    Map<String, Object> request;
+    @OrderBy("createdDate")
+    @OneToMany(mappedBy = "context", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
+    private List<MessageContextContentEntity> messageContents;
 
-    @Setter
-    @Nullable
-    @JoinColumn(nullable = true, name = "user_id")
-    @ManyToOne(optional = true, targetEntity = UserEntity.class)
-    UserEntity userEntity;
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "user_id")
+    private UserEntity userEntity;
 
-    @Column(nullable = false, updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "service_id")
+    private ServiceEntity serviceEntity;
+
     @CreatedDate
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false, updatable = false)
     private Date createdDate;
 
-    //public MessageContextEntity(){}
+    @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    @LastModifiedDate
+    private Timestamp lastModifiedDate;
+
+    @Setter
+    @Column(nullable = false)
+    boolean isActive = true;
+
+    public List<String> getBodies(){
+        return messageContents.stream().map(MessageContextContentEntity::getBody).toList();
+    }
+    public List<DocumentEntity> getDocumentEntities(){
+        return messageContents.stream().map(MessageContextContentEntity::getDocumentEntity).filter(Objects::nonNull).toList();
+    }
+
+    public String getContentAsDebugString(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (MessageContextContentEntity messageContent : messageContents) {
+            stringBuilder.append(messageContent.getBody()).append('\n');
+
+            if(messageContent.getDocumentEntity() != null){
+                stringBuilder.append('[').append(messageContent.getDocumentEntity().getFileType());
+                if(messageContent.getDocumentEntity().getDocumentType() != null){
+                    stringBuilder.append(':').append(messageContent.getDocumentEntity().getDocumentType().getName());
+                }
+                stringBuilder.append("]\n");;
+            }
+        }
+
+        return stringBuilder.toString();
+    }
 }

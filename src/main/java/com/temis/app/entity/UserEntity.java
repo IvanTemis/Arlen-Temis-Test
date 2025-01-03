@@ -55,4 +55,20 @@ public class UserEntity {
     @Nullable
     @OneToOne(mappedBy="userEntity", targetEntity = NotaryEmployeeEntity.class, optional = true)
     private NotaryEmployeeEntity employee;
+
+
+
+    public String getSuitableName(){
+        String name = nickName;
+
+        if (firstName != null) {
+            name = firstName;
+
+            if (lastName != null) {
+                name += " " + lastName;
+            }
+        }
+
+        return name;
+    }
 }

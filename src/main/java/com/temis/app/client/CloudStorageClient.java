@@ -67,7 +67,7 @@ public class CloudStorageClient {
     }
 
     public String ReadFile(String bucketName, String objectName) throws IOException {
-        log.info("Begining read of file from bucket {} as {}", bucketName, objectName);
+        log.info("Beginning read of file from bucket {} as {}", bucketName, objectName);
 
         BlobId blobId = BlobId.of(bucketName, objectName);
 
@@ -90,4 +90,64 @@ public class CloudStorageClient {
             return result.toString(StandardCharsets.UTF_8);
         }
     }
+
+    public  byte[] ReadFileBytes(String objectUri) throws IOException {
+        assert objectUri.startsWith("gs://");
+
+        var uri = objectUri.replace("gs://", "");
+
+        var slash = uri.indexOf('/');
+
+        return ReadFileBytes(uri.substring(0, slash), uri.substring(slash + 1));
+    }
+
+    public byte[] ReadFileBytes(String bucketName, String objectName) throws IOException {
+        log.info("Beginning read of file bytes from bucket {} as {}", bucketName, objectName);
+
+        BlobId blobId = BlobId.of(bucketName, objectName);
+
+        Blob blob = storage.get(blobId);
+
+        if(blob == null){
+            throw new InvalidPathException("gs://" + bucketName + "/" + objectName, "Returned null in project " + projectId);
+        }
+
+        blob.getContentType();
+
+        try (var reader = blob.reader(); InputStream stream = Channels.newInputStream(reader)) {
+
+            ByteArrayOutputStream result = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            for (int length; (length = stream.read(buffer)) != -1; ) {
+                result.write(buffer, 0, length);
+            }
+
+            return result.toByteArray();
+        }
+    }
+
+    public String getMimeType(String objectUri) throws IOException {
+        if (!objectUri.startsWith("gs://")) {
+            throw new IllegalArgumentException("El URI debe comenzar con 'gs://'");
+        }
+    
+        String uri = objectUri.replace("gs://", "");
+        int slash = uri.indexOf('/');
+        if (slash == -1) {
+            throw new IllegalArgumentException("El URI no contiene un nombre de objeto válido");
+        }
+    
+        String bucketName = uri.substring(0, slash);
+        String objectName = uri.substring(slash + 1);
+    
+        BlobId blobId = BlobId.of(bucketName, objectName);
+        Blob blob = storage.get(blobId);
+    
+        if (blob == null) {
+            throw new InvalidPathException(objectUri, "El archivo no existe en el bucket");
+        }
+    
+        return blob.getContentType();
+    }
+
 }

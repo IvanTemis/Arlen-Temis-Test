@@ -3,6 +3,7 @@ package com.temis.app.state;
 import com.google.api.gax.rpc.ResourceExhaustedException;
 import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
+import com.temis.app.exception.JSONNotFoundException;
 import com.temis.app.repository.MessageResponseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +24,8 @@ public abstract class StateTemplate {
         _otherStates = otherStates;
     }
 
-    protected void PreEvaluate(MessageContextEntity message) {
-        log.debug("Pre-Evaluating state.");
-    }
-
     public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
-        PreEvaluate(message);
-        log.info("Evaluating State for Message with Id: {}", message.getId());
+        log.info("Evaluating State {} for Message with Id: {}", this.getClass().getSimpleName(), message.getId());
         log.debug("Processing {} possible transitions.", _otherStates.size());
         for (var state : _otherStates){
             log.debug("Checking if should transition into {}.", state.getClass().getSimpleName());
@@ -43,7 +39,7 @@ public abstract class StateTemplate {
                 .phoneNumber(message.getPhoneNumber())
                 .userEntity(message.getUserEntity());
 
-        log.info("Executing State for Message with Id: {}", message.getId());
+        log.info("Executing State {} for Message with Id: {}", this.getClass().getSimpleName(), message.getId());
 
         Exception exception = null;
         String exceptionMessage = "The cake is a lie.";
@@ -54,6 +50,10 @@ public abstract class StateTemplate {
         catch (ResourceExhaustedException e){
             exception = e;
             exceptionMessage = "Se ha superado la quota por minuto. Por favor espera un momento antes de continuar la conversación.";
+        }
+        catch (JSONNotFoundException e){
+            exception = e;
+            exceptionMessage = e.getMessage();
         }
         catch (Exception e) {
             exception = e;
@@ -66,7 +66,8 @@ public abstract class StateTemplate {
                     .messageContextEntity(message)
                     .phoneNumber(message.getPhoneNumber())
                     .userEntity(message.getUserEntity())
-                    .body(exceptionMessage);
+                    .exception(exception.toString())
+                    .addContent(exceptionMessage);
             log.error("An error occurred during state evaluation", exception);
         }
 

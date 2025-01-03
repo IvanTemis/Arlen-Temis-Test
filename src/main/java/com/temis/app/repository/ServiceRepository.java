@@ -10,4 +10,6 @@ import java.util.List;
 
 @Repository
 public interface ServiceRepository extends CrudRepository<ServiceEntity, Long> {
+    ServiceEntity findFirstByPhoneNumberAndIsActiveTrue(String phoneNumber);
+    List<ServiceEntity> findByUser(UserEntity user);
 }

@@ -25,7 +25,7 @@ public class VertexAIClient {
 
         // Configuración de generación y seguridad por defecto
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
-                .setMaxOutputTokens(1024)
+                .setMaxOutputTokens(2048)
                 .setTemperature(0.2F)
                 .setTopP(0.95F)
                 .build();

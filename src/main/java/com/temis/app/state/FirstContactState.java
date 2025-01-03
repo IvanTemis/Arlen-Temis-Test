@@ -28,15 +28,16 @@ public class FirstContactState extends StateTemplate{
     }
 
     @Override
-    protected void PreEvaluate(MessageContextEntity message) {
-        super.PreEvaluate(message);
-        messageContextRepository.save(message);
+    protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
+        responseBuilder.addContent("¡Hola! Soy el agente de IA de TEMIS.\nActualmente me encuentro en *Beta Cerrada* y parece que no has sido habilitado para usar este servicio.\n\n(Si consideras que esto es un error, por favor contacta a los administradores)");
     }
 
     @Override
-    protected void Execute(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder) {
-
-        responseBuilder.body("¡Hola! Soy el agente de IA de TEMIS.\nActualmente me encuentro en *Beta Cerrada* y parece que no has sido habilitado para usar este servicio.\n\n(Si consideras que esto es un error, por favor contacta a los administradores)");
+    public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
+        message.setActive(false);
+        messageContextRepository.save(message);
+        var result = super.Evaluate(message);
+        messageContextRepository.save(message);
+        return result;
     }
-
 }

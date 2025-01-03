@@ -3,9 +3,8 @@ package com.temis.app.client;
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.api.*;
 import com.google.cloud.vertexai.generativeai.*;
-import com.google.protobuf.ByteString;
+import com.temis.app.utils.VertexAIUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -17,23 +16,23 @@ public class ChatAIClient {
 
     private final VertexAI vertexAi;
     private final GenerativeModel baseModel;
+    private final String agentId;
 
     private String systemInstruction = null;
 
     private final CloudStorageClient cloudStorageClient;
 
-    // Constructor para inicializar con los parámetros dinámicos
-    public ChatAIClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient) throws IOException {
+    public ChatAIClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient, String agentId) throws IOException {
         this.cloudStorageClient = cloudStorageClient;
+        this.agentId = agentId;
         this.vertexAi = new VertexAI(projectId, location);
 
-        // Configuración de generación y seguridad por defecto
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
-                .setMaxOutputTokens(512)
+                .setMaxOutputTokens(2048)
                 .setTemperature(0.5F)
                 .setTopP(0.9F)
                 .build();
-        //TODO: SafetySetting.HarmBlockThreshold.BLOCK_LOW_AND_ABOVE genera una exepción en vez de corregir el resultado
+
         List<SafetySetting> safetySettings = Arrays.asList(
                 SafetySetting.newBuilder()
                         .setCategory(HarmCategory.HARM_CATEGORY_HATE_SPEECH)
@@ -55,7 +54,6 @@ public class ChatAIClient {
 
         UpdatePrompt();
 
-        // Construir el modelo generativo
         this.baseModel = new GenerativeModel.Builder()
                 .setModelName(modelName)
                 .setVertexAi(vertexAi)
@@ -67,33 +65,42 @@ public class ChatAIClient {
 
 
     public void UpdatePrompt() throws IOException {
-        log.info("Updating prompt for ChatAI...");
-        systemInstruction = cloudStorageClient.ReadFile("gs://temis-storage/valanz/model/prompt.txt");
+        log.info("Updating prompt for agent: {}", agentId);
+        String promptPath = String.format("gs://temis-storage/prompts/%s.txt", agentId);
+        this.systemInstruction = cloudStorageClient.ReadFile(promptPath);
     }
 
-    // Cerrar el cliente Vertex AI
     public void close() throws Exception {
         this.vertexAi.close();
     }
 
-    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String context) throws IOException {
+    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String context) throws Exception {
         var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
 
         ChatSession chatSession = model.startChat();
 
         if(history != null) chatSession.setHistory(history);
 
-        return chatSession.sendMessage(message);
+        return VertexAIUtils.ExponentialBackoff(10,100,10000,() -> {
+            try {
+                return chatSession.sendMessage(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, log);
     }
 
-    public String filterResponse(String response) {
-        // Limita las respuestas a un máximo de 4 oraciones
-        String[] sentences = response.split("\\n");
-        int maxSentences = Math.min(sentences.length, 4);
-        StringBuilder filteredResponse = new StringBuilder();
-        for (int i = 0; i < maxSentences; i++) {
-            filteredResponse.append(sentences[i].trim()); //.append(". ")
-        }
-        return filteredResponse.toString().trim();
+    public ResponseStream<GenerateContentResponse> startStreaming(Content message, String context) throws Exception {
+        var model = baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
+    
+        ChatSession chatSession = model.startChat();
+    
+        return VertexAIUtils.ExponentialBackoff(10, 100, 10000, () -> {
+            try {
+                return chatSession.sendMessageStream(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, log);
     }
 }

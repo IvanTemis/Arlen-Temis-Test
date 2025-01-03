@@ -4,15 +4,13 @@ import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.entity.MessageResponseEntity;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.repository.UserRepository;
-import com.temis.app.state.with_user.AIChatState;
-import com.temis.app.state.with_user.AdminCommandState;
-import com.temis.app.state.with_user.BeginDocumentCreationState;
-import com.temis.app.state.with_user.ProcessFileIntransitableState;
+import com.temis.app.state.with_user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 @Component
 public class ExistingUserState extends StateTemplate{
@@ -22,11 +20,11 @@ public class ExistingUserState extends StateTemplate{
     private MessageContextRepository messageContextRepository;
 
     @Autowired
-    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, AIChatState aiChatState) {
+    public ExistingUserState(AdminCommandState adminCommandState, ProcessFileIntransitableState processFileIntransitableState, ServiceEntityState serviceEntityState) {
         super(new ArrayList<>(){{
-            add(adminCommandState);
             add(processFileIntransitableState);
-            add(aiChatState);
+            add(adminCommandState);
+            add(serviceEntityState);
         }});
     }
 
@@ -54,9 +52,22 @@ public class ExistingUserState extends StateTemplate{
             name = message.getUserEntity().getFirstName();
         }
 
-        responseBuilder.body(MessageFormat.format("¡Hola {0}! ¿En qué puedo ayudarte hoy?", name));
-        responseBuilder.quickActions(new ArrayList<>(){{
-            add(BeginDocumentCreationState.compraventa);
-        }});
+        responseBuilder.addContent(
+                MessageFormat.format("¡Hola {0}! ¿En qué puedo ayudarte hoy?", name),
+                new ArrayList<>(){{
+                    add(BeginDocumentCreationState.compraventa);
+                }}
+        );
+    }
+
+    @Override
+    public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
+        var result = super.Evaluate(message);
+        var user = message.getUserEntity();
+        if(user != null) {
+            user.setLastInteractionDate(new Date());
+            userRepository.save(user);
+        }
+        return result;
     }
 }
