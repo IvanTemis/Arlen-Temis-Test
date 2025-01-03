@@ -4,5 +4,5 @@ import com.temis.app.entity.MessageResponseEntity;
 
 public interface MessageService {
 
-    void sendResponseToUser(MessageResponseEntity response);
+    void sendResponseToUser(MessageResponseEntity response) throws InterruptedException;
 }

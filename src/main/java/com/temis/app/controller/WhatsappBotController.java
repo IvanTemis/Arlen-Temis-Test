@@ -88,7 +88,7 @@ public class WhatsappBotController {
         var phoneNumber = message.from();
         var nickName = message.contacts() != null ? message.contacts().get(0).profile().name() : "UNKNOWN";
 
-        var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber);
+        var context = messageContextRepository.findFirstByPhoneNumberAndMessageSourceAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber, MessageSource.META);
 
         if (context == null) {
             context = MessageContextEntity.builder()
@@ -147,7 +147,7 @@ public class WhatsappBotController {
 
         log.info("WhatsappBotController twilio: {}", requestBody);
 
-        var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber);
+        var context = messageContextRepository.findFirstByPhoneNumberAndMessageSourceAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber, MessageSource.TWILIO);
 
         if (context == null) {
             context = MessageContextEntity.builder()

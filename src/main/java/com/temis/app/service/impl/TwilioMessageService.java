@@ -29,8 +29,8 @@ public class TwilioMessageService implements MessagePlatformService {
     }
 
     @Override
-    public void sendMessage(MessageResponseEntity response) {
-        try {
+    public void sendMessage(MessageResponseEntity response) throws InterruptedException {
+
             for (MessageResponseContentEntity content : response.getResponseContents()) {
 
                 var message = Message.creator(
@@ -48,8 +48,5 @@ public class TwilioMessageService implements MessagePlatformService {
 
                 Thread.sleep(2000);
             }
-        } catch (Exception e) {
-            log.error("Error al enviar mensaje a {}: {}", response.getPhoneNumber(), e.getMessage(), e);
-        }
     }
 }
