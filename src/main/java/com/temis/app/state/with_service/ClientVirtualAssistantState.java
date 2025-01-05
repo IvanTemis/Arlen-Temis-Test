@@ -62,7 +62,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
                 text += ":";
             }
-
+            text += "\n";
             aiContentBuilder.addParts(Part.newBuilder().setText(text));
 
             if (content.getDocumentEntity() != null) {
