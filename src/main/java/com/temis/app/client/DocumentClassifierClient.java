@@ -70,7 +70,7 @@ public class DocumentClassifierClient {
 
     public void UpdatePrompt() throws IOException {
         log.info("Updating prompt for DocumentClassifier...");
-        systemInstruction = cloudStorageClient.ReadFile("gs://temis-storage/valanz/model/classifier-prompt.txt");
+        systemInstruction = cloudStorageClient.ReadFile("gs://temis-prd-storage/valanz/model/classifier-prompt.txt");
     }
 
     // Cerrar el cliente Vertex AI
