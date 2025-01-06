@@ -66,7 +66,7 @@ public class ChatAIClient {
 
     public void UpdatePrompt() throws IOException {
         log.info("Updating prompt for agent: {}", agentId);
-        String promptPath = String.format("gs://temis-storage/prompts/%s.txt", agentId);
+        String promptPath = String.format("gs://temis-prd-storage/prompts/%s.txt", agentId);
         this.systemInstruction = cloudStorageClient.ReadFile(promptPath);
     }
 
