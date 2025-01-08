@@ -31,6 +31,7 @@ public class MessageProcessingServiceImpl implements MessageProcessingService {
 
     @Override
     public void scheduleMessageProcessing(String phoneNumber) {
+        log.info("Actualizando scheduler para {}.", phoneNumber);
         ScheduledFuture<?> previousTimer = userTimers.get(phoneNumber);
         if (previousTimer != null && !previousTimer.isDone()) {
             previousTimer.cancel(false);
