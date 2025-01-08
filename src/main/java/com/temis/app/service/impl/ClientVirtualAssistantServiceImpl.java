@@ -69,7 +69,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
     String draftText = draftBuilder.toString();
 
-    draftEmailService.sendDraftByEmail(draftText, user.getEmail());
+    draftEmailService.sendDraftByEmail(inputJson,draftText, user.getEmail());
 
     return draftText;
 }
