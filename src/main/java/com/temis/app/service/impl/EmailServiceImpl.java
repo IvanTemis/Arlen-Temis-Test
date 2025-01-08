@@ -58,9 +58,11 @@ public class EmailServiceImpl implements EmailService {
         }
         helper.setText(body, true);
 
-        for (Pair<String, ByteArrayResource> attachment : attachments) {
+
+        //TO-DO Regresar codigo para que envie documento.
+        /*for (Pair<String, ByteArrayResource> attachment : attachments) {
             helper.addAttachment(attachment.getFirst(), attachment.getSecond());
-        }
+        }*/
 
         mailSender.send(message);
 

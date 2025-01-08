@@ -63,7 +63,7 @@ public class DraftEmailService {
             <html>
                 <body style="font-family: Arial, sans-serif; color: #333333; line-height: 1.6;">
                     <div style="border: 1px solid #dddddd; padding: 20px; max-width: 600px; margin: auto;">
-                        <img src="https://lh7-rt.googleusercontent.com/docsz/AD_4nXfD8MCYZ168lxo1yiRWy3HZdZocWb3YlGk6Os-Wg34BpyGP2uyl-t8HupEDFwFcpWMOrXq2buGaa7oYEWWBWNRVEAolDrXXBY386aeg9Fs-7mLCl-VtCVWGj6PD6zh-frvJpzK1OQ?key=7b8-sBcKAi0R5Q9gtLOOytt6" alt="Valanz" style="max-width: 150px; display: block; margin: 0 auto 20px;" />
+                        <img src="https://lh7-rt.googleusercontent.com/docsz/AD_4nXfD8MCYZ168lxo1yiRWy3HZdZocWb3YlGk6Os-Wg34BpyGP2uyl-t8HupEDFwFcpWMOrXq2buGaa7oYEWWBWNRVEAolDrXXBY386aeg9Fs-7mLCl-VtCVWGj6PD6zh-frvJpzK1OQ?key=7b8-sBcKAi0R5Q9gtLOOytt6" alt="Valanz" style="max-width:100%; display: block; margin: 0 auto 20px;" />
                         <p>Estimada Lic. Zélica,</p>
                         <p>A continuación te comparto una nueva solicitud de <strong>Constitutiva de Empresas</strong> que recibimos:</p>
                         <ul>
@@ -82,7 +82,7 @@ public class DraftEmailService {
                         <p>Te adjunto el borrador de la Constitutiva. Quedo al pendiente para cualquier duda.</p>
                         <p>Saludos,<br />Valentina</p>
                         <hr style="border: none; border-top: 1px solid #dddddd; margin: 20px 0;" />
-                        <img src="https://lh7-rt.googleusercontent.com/docsz/AD_4nXfD8MCYZ168lxo1yiRWy3HZdZocWb3YlGk6Os-Wg34BpyGP2uyl-t8HupEDFwFcpWMOrXq2buGaa7oYEWWBWNRVEAolDrXXBY386aeg9Fs-7mLCl-VtCVWGj6PD6zh-frvJpzK1OQ?key=7b8-sBcKAi0R5Q9gtLOOytt6" alt="Temis Legal" style="max-width: 150px; display: block; margin: 0 auto;" />
+                        <img src="https://lh7-rt.googleusercontent.com/docsz/AD_4nXfD8MCYZ168lxo1yiRWy3HZdZocWb3YlGk6Os-Wg34BpyGP2uyl-t8HupEDFwFcpWMOrXq2buGaa7oYEWWBWNRVEAolDrXXBY386aeg9Fs-7mLCl-VtCVWGj6PD6zh-frvJpzK1OQ?key=7b8-sBcKAi0R5Q9gtLOOytt6" alt="Temis Legal" style="max-width:100%; display: block; margin: 0 auto;" />
                     </div>
                 </body>
             </html>
