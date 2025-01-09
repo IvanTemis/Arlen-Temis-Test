@@ -1,21 +1,22 @@
 package com.temis.app.client;
 
 import com.google.cloud.vertexai.VertexAI;
-import com.google.cloud.vertexai.api.*;
+import com.google.cloud.vertexai.api.GenerateContentResponse;
+import com.google.cloud.vertexai.api.GenerationConfig;
+import com.google.cloud.vertexai.api.HarmCategory;
+import com.google.cloud.vertexai.api.SafetySetting;
 import com.google.cloud.vertexai.generativeai.ChatSession;
 import com.google.cloud.vertexai.generativeai.ContentMaker;
 import com.google.cloud.vertexai.generativeai.GenerativeModel;
-import com.temis.app.entity.DocumentEntity;
 import com.temis.app.utils.VertexAIUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-public class DocumentClassifierClient {
+public class EmailContentCreatorClient {
 
     private final VertexAI vertexAi;
     private final GenerativeModel baseModel;
@@ -25,7 +26,7 @@ public class DocumentClassifierClient {
     private final CloudStorageClient cloudStorageClient;
 
     // Constructor para inicializar con los parámetros dinámicos
-    public DocumentClassifierClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient) throws IOException {
+    public EmailContentCreatorClient(String projectId, String location, String modelName, CloudStorageClient cloudStorageClient) throws IOException {
         this.cloudStorageClient = cloudStorageClient;
         this.vertexAi = new VertexAI(projectId, location);
 
@@ -69,8 +70,8 @@ public class DocumentClassifierClient {
 
 
     public void UpdatePrompt() throws IOException {
-        log.info("Updating prompt for DocumentClassifier...");
-        systemInstruction = cloudStorageClient.ReadFile("gs://temis-prd-storage/prompts/document-classifier-agent.txt");
+        log.info("Updating prompt for EmailContentCreator...");
+        systemInstruction = cloudStorageClient.ReadFile("gs://temis-prd-storage/prompts/email-content-creator-agent.txt");
     }
 
     // Cerrar el cliente Vertex AI
@@ -78,12 +79,8 @@ public class DocumentClassifierClient {
         this.vertexAi.close();
     }
 
-    public GenerateContentResponse Classify(String gsUrl, String mimeType, String context) throws Exception {
-        var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
-
-        ChatSession chatSession = model.startChat();
-
-        var content = VertexAIUtils.ContentWithDocument("Clasifica este documento", gsUrl, mimeType);
+    public GenerateContentResponse CreateEmailContent(String content) throws Exception {
+        ChatSession chatSession = baseModel.startChat();
 
         return VertexAIUtils.ExponentialBackoff(10,1000,10000,() -> {
             try {

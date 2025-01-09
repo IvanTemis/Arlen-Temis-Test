@@ -3,6 +3,7 @@ package com.temis.app.state.with_user;
 import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.client.DocumentClassifierClient;
+import com.temis.app.client.EmailContentCreatorClient;
 import com.temis.app.entity.*;
 import com.temis.app.manager.AgentManager;
 import com.temis.app.repository.MessageResponseRepository;
@@ -33,6 +34,8 @@ public class AdminCommandState extends  StateWithUserTemplate{
     AgentManager agentManager;
     @Autowired
     private DocumentClassifierClient documentClassifierClient;
+    @Autowired
+    private EmailContentCreatorClient emailContentCreatorClient;
 
     @Autowired
     EmailService emailService;
@@ -83,7 +86,9 @@ public class AdminCommandState extends  StateWithUserTemplate{
                     for (ChatAIClient agent : agentManager.getAllAgents()) {
                         agent.UpdatePrompt();
                     }
+                    //TODO: Abstraer UpdatePrompt para que sea compartido por todos los agentes
                     documentClassifierClient.UpdatePrompt();
+                    emailContentCreatorClient.UpdatePrompt();
 
                     responseBuilder.addContent("Prompts actualizados exitosamente.");
                 }

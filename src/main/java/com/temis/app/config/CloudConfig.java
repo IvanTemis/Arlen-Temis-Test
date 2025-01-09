@@ -1,9 +1,6 @@
 package com.temis.app.config;
 
-import com.temis.app.client.CloudStorageClient;
-import com.temis.app.client.DocumentClassifierClient;
-import com.temis.app.client.VertexAIClient;
-import com.temis.app.client.GoogleCalendarClient;
+import com.temis.app.client.*;
 
 import java.io.IOException;
 
@@ -51,6 +48,17 @@ public class CloudConfig {
     @DependsOn({"cloudStorageClient"})
     public DocumentClassifierClient documentClassifierClient(@Autowired CloudStorageClient cloudStorageClient) throws IOException {
         return new DocumentClassifierClient(
+                cloudConfigProperties.getProjectId(),
+                cloudConfigProperties.getLocation(),
+                cloudConfigProperties.getVertexai().getModelName(),
+                cloudStorageClient
+        );
+    }
+
+    @Bean
+    @DependsOn({"cloudStorageClient"})
+    public EmailContentCreatorClient emailContentCreatorClient(@Autowired CloudStorageClient cloudStorageClient) throws IOException {
+        return new EmailContentCreatorClient(
                 cloudConfigProperties.getProjectId(),
                 cloudConfigProperties.getLocation(),
                 cloudConfigProperties.getVertexai().getModelName(),

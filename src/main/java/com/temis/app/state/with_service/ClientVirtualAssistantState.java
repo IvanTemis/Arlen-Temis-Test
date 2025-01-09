@@ -144,6 +144,9 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     log.info("Evento creado en el calendario: {}", event.getHtmlLink());
                 }
             }
+            case COMPANY_INCORPORATION -> {
+                result = "Muchas gracias.?LL? La Lic. Zélica Castro se pondrá en contacto contigo en breve.";
+            }
             default -> throw new Exception("Estado " + service.getServiceStage().name() + " es inválido.");
         }
 
