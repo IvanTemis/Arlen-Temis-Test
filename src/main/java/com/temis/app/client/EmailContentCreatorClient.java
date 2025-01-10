@@ -32,7 +32,7 @@ public class EmailContentCreatorClient {
 
         // Configuración de generación y seguridad por defecto
         GenerationConfig generationConfig = GenerationConfig.newBuilder()
-                .setMaxOutputTokens(512)
+                .setMaxOutputTokens(8192)
                 .setTemperature(0.5F)
                 .setTopP(0.9F)
                 .build();
@@ -52,6 +52,10 @@ public class EmailContentCreatorClient {
                         .build(),
                 SafetySetting.newBuilder()
                         .setCategory(HarmCategory.HARM_CATEGORY_HARASSMENT)
+                        .setThreshold(SafetySetting.HarmBlockThreshold.BLOCK_NONE)
+                        .build(),
+                SafetySetting.newBuilder()
+                        .setCategory(HarmCategory.HARM_CATEGORY_UNSPECIFIED)
                         .setThreshold(SafetySetting.HarmBlockThreshold.BLOCK_NONE)
                         .build()
         );
