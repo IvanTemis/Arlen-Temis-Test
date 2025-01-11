@@ -119,7 +119,8 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     log.info("Borrador generado: {}", draft);
                     log.info("Borrador enviado por correo al usuario: {}", user.getEmail());
 
-                    // Creamos un evento en el calendario
+                    //TODO Que esta madre jale, o que al menos no tumbe todo el proceso
+                    /* Creamos un evento en el calendario
                     GoogleCalendarClient calendarClient = new GoogleCalendarClient("Temis Application");
                     String startDateTime = java.time.LocalDateTime.now().plusDays(1).toString();
                     String endDateTime = java.time.LocalDateTime.now().plusDays(1).plusHours(1).toString();
@@ -141,7 +142,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                             additionalAttendees
                     );
 
-                    log.info("Evento creado en el calendario: {}", event.getHtmlLink());
+                    log.info("Evento creado en el calendario: {}", event.getHtmlLink());*/
                 }
             }
             case COMPANY_INCORPORATION -> {
