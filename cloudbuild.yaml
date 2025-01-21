@@ -71,6 +71,8 @@ steps:
         --secret=spring_mail_password)" >> secrets.properties
         
         echo "cloud.serviceUrl=$(gcloud run services describe $_SERVICE_NAME --platform managed --region $_DEPLOY_REGION --format 'value(status.url)')" >> secrets.properties
+        
+        echo "spring.profiles.active=gcloud" >> secrets.properties
     entrypoint: bash
   - name: 'maven:3.9.9-amazoncorretto-17-al2023'
     args:
