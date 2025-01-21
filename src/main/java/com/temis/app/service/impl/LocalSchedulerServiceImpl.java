@@ -11,8 +11,8 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.*;
 
 @Slf4j
+@Profile("!gcloud")
 @Service
-@Profile("!gcloud-run")
 public class LocalSchedulerServiceImpl implements SchedulerService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ConcurrentHashMap<String, ScheduledFuture<?>> userTimers = new ConcurrentHashMap<>();

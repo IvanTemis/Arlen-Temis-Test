@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.*;
 
 @Slf4j
+@Profile("gcloud")
 @Service
-@Profile("gcloud-run")
 public class CloudTasksSchedulerServiceImpl implements SchedulerService {
     private final ConcurrentHashMap<String, String> userTasks = new ConcurrentHashMap<>();
 

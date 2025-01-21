@@ -76,7 +76,7 @@ steps:
     args:
       - clean
       - package
-      - '-Dspring.profiles.active=gcloud-run'
+      - '-Dspring.profiles.active=gcloud'
       - '-Dmaven.test.skip=true'
       - '-Dspring.config.import=file:secrets.properties'
     id: Maven
