@@ -1,10 +1,13 @@
 package com.temis.app.config.properties;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
+@Slf4j
 @Getter
 @Setter
 @ConfigurationProperties("cloud")
@@ -12,6 +15,7 @@ public class CloudConfigProperties {
     
     private String projectId;
     private String location;
+    private String serviceUrl;
 
     @NestedConfigurationProperty
     private VertexAiConfigProperties vertexai;
@@ -38,5 +42,12 @@ public class CloudConfigProperties {
     @Setter
     public static class CalendarConfigProperties {
         private String applicationName;
+    }
+
+    @PostConstruct
+    void LogFields(){
+        if (log.isInfoEnabled()) {
+            log.info("SERVICE URL IS '{}'", this.serviceUrl);
+        }
     }
 }
