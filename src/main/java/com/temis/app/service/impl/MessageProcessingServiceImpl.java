@@ -16,10 +16,6 @@ import java.util.concurrent.*;
 @Service
 @Slf4j
 public class MessageProcessingServiceImpl implements MessageProcessingService {
-
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private final ConcurrentHashMap<String, ScheduledFuture<?>> userTimers = new ConcurrentHashMap<>();
-
     @Autowired
     private FirstContactState firstContactState;
 
@@ -30,24 +26,7 @@ public class MessageProcessingServiceImpl implements MessageProcessingService {
     private MessageContextRepository messageContextRepository;
 
     @Override
-    public void scheduleMessageProcessing(String phoneNumber) {
-        log.info("Actualizando scheduler para {}.", phoneNumber);
-        ScheduledFuture<?> previousTimer = userTimers.get(phoneNumber);
-        if (previousTimer != null && !previousTimer.isDone()) {
-            previousTimer.cancel(false);
-        }
-
-        ScheduledFuture<?> timer = scheduler.schedule(() -> {
-            try {
-                processAccumulatedMessages(phoneNumber);
-            } catch (Exception e) {
-                log.error("Error durante procesamiento de mensajes acumulados para " + phoneNumber, e);
-            }
-        }, 10, TimeUnit.SECONDS);
-        userTimers.put(phoneNumber, timer);
-    }
-
-    private void processAccumulatedMessages(String phoneNumber) throws Exception {
+    public void ProcessAccumulatedMessages(String phoneNumber) throws Exception {
 
         //TODO: Qué pasa si a 2 números diferentes (Twilio/Meta) del mismo número??
         var context = messageContextRepository.findFirstByPhoneNumberAndIsActiveTrueOrderByCreatedDateAsc(phoneNumber);
@@ -64,17 +43,5 @@ public class MessageProcessingServiceImpl implements MessageProcessingService {
         log.info("Se generaron {} respuestas para {}: {}", response.getResponseContents().size(), phoneNumber, response.getContentAsDebugString());
     
         messageService.sendResponseToUser(response);
-    }
-
-    @Override
-    public void shutdown() {
-        scheduler.shutdown();
-        try {
-            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
-                scheduler.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            scheduler.shutdownNow();
-        }
     }
 }

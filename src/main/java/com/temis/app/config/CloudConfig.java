@@ -28,6 +28,15 @@ public class CloudConfig {
                 cloudConfigProperties.getVertexai().getModelName()
         );
     }
+    @Bean
+    public CloudTaskClient cloudTaskClient() {
+        return new CloudTaskClient(
+                cloudConfigProperties.getProjectId(),
+                cloudConfigProperties.getLocation(),
+                cloudConfigProperties.getServiceUrl(),
+                cloudConfigProperties.getServiceAccountEmail()
+        );
+    }
 
     @Bean
     public CloudStorageClient cloudStorageClient() {

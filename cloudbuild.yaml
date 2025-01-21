@@ -45,6 +45,9 @@ steps:
 
         echo "cloud.location=$(gcloud secrets versions access latest
         --secret=cloud_location)" >> secrets.properties
+        
+        echo "cloud.serviceAccountEmail=$(gcloud secrets versions access latest
+        --secret=cloud_serviceAccountEmail)" >> secrets.properties
 
         echo "cloud.vertexai.modelName=$(gcloud secrets versions access latest
         --secret=cloud_vertexai_modelName)" >> secrets.properties

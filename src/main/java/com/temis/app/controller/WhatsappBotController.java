@@ -8,8 +8,8 @@ import com.temis.app.exceptions.AccessForbiddenException;
 import com.temis.app.model.MessageSource;
 import com.temis.app.repository.MessageContextContentRepository;
 import com.temis.app.repository.MessageContextRepository;
-import com.temis.app.service.MessageProcessingService;
 import com.temis.app.service.MessageService;
+import com.temis.app.service.SchedulerService;
 import com.temis.app.state.FirstContactState;
 import com.whatsapp.api.domain.webhook.WebHook;
 import com.whatsapp.api.domain.webhook.type.FieldType;
@@ -32,7 +32,7 @@ public class WhatsappBotController {
     @Autowired
     private MessageService messageService;
     @Autowired
-    private MessageProcessingService messageProcessingService;
+    private SchedulerService schedulerService;
 
     @Autowired
     private WhatsappBusinessCloudApi whatsappBusinessCloudApi;
@@ -130,7 +130,7 @@ public class WhatsappBotController {
         }
 
         messageContextContentRepository.save(contentBuilder.build());
-        messageProcessingService.scheduleMessageProcessing(phoneNumber);
+        schedulerService.ScheduleMessageProcessing(phoneNumber);
     }
 
     @PostMapping("/webhook-twilio")
@@ -175,6 +175,6 @@ public class WhatsappBotController {
         }
 
         messageContextContentRepository.save(contentBuilder.build());
-        messageProcessingService.scheduleMessageProcessing(phoneNumber);
+        schedulerService.ScheduleMessageProcessing(phoneNumber);
     }
 }

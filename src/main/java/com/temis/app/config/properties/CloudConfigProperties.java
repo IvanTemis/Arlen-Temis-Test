@@ -16,6 +16,7 @@ public class CloudConfigProperties {
     private String projectId;
     private String location;
     private String serviceUrl;
+    private String serviceAccountEmail;
 
     @NestedConfigurationProperty
     private VertexAiConfigProperties vertexai;
