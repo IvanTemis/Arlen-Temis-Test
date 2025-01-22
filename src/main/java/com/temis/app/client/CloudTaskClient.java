@@ -44,15 +44,16 @@ public class CloudTaskClient {
 
             // Add your service account email to construct the OIDC token.
             // in order to add an authentication header to the request.
-            var oidcToken =  OidcToken.newBuilder().setAudience(targetUrl).setServiceAccountEmail(this.serviceAccountEmail).build();
+            //Esto no se usa porque causa un error de "service_account_email must be set"
+            //var oidcToken =  OidcToken.newBuilder().setAudience(targetUrl).setServiceAccountEmail(this.serviceAccountEmail).build();
             //var oauth = OAuthToken.newBuilder().setServiceAccountEmail(serviceAccountEmail).build();
 
             Task.Builder taskBuilder = Task.newBuilder()
                     .setScheduleTime(scheduleTime)
                     .setHttpRequest(
                             HttpRequest.newBuilder()
-                                    //.putAllHeaders(headers)
-                                    //.setBody(body)
+                                    .putAllHeaders(headers)
+                                    .setBody(body)
                                     .setHttpMethod(httpMethod)
                                     .setUrl(targetUrl)
                                     //.setOidcToken(oidcToken)
