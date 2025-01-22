@@ -59,6 +59,8 @@ public class CloudTaskClient {
                                     //.setOauthToken(oauth)
                                     .build());
 
+            log.info("Creating task...");
+
             var task = client.createTask(queuePath, taskBuilder.build());
 
             log.info("Created task {}", task.getName());
