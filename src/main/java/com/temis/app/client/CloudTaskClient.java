@@ -5,10 +5,14 @@ import com.google.cloud.tasks.v2.CloudTasksClient;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
+@Slf4j
 public class CloudTaskClient {
 
     private final String projectId;
@@ -24,28 +28,31 @@ public class CloudTaskClient {
     }
 
     public void DeleteTask(String taskName) throws IOException {
+        log.info("Deleting task '{}'", taskName);
         try (CloudTasksClient client = CloudTasksClient.create()) {
             client.deleteTask(taskName);
         }
     }
 
-    public Task CreateTask(String queueId, String relativeEndpoint, HttpMethod httpMethod, ByteString body, Timestamp scheduleTime) throws IOException {
+    public Task CreateTask(String queueId, String relativeEndpoint, HttpMethod httpMethod, Map<String, String> headers, ByteString body, Timestamp scheduleTime) throws IOException {
+        log.info("Creating {} task in queue '{}' for endpoint '{}':\n{}\n{}\n{}", httpMethod, queueId, relativeEndpoint,headers,body,scheduleTime);
         try (CloudTasksClient client = CloudTasksClient.create()) {
 
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
 
             // Add your service account email to construct the OIDC token.
             // in order to add an authentication header to the request.
-            OidcToken.Builder oidcTokenBuilder =
-                    OidcToken.newBuilder().setServiceAccountEmail(serviceAccountEmail);
+            var oauthToken =
+                    OAuthToken.newBuilder().setServiceAccountEmail(serviceAccountEmail);
 
             Task.Builder taskBuilder = Task.newBuilder()
                     .setScheduleTime(scheduleTime)
                     .setHttpRequest(
                             HttpRequest.newBuilder()
+                                    .putAllHeaders(headers)
                                     .setBody(body)
                                     .setHttpMethod(httpMethod)
-                                    .setOidcToken(oidcTokenBuilder)
+                                    .setOauthToken(oauthToken)
                                     .setUrl(serviceUrl + relativeEndpoint)
                                     .build());
 
@@ -57,6 +64,10 @@ public class CloudTaskClient {
         Gson gson = new Gson();
         String json = gson.toJson(body);
 
-        return this.CreateTask(queueId, relativeEndpoint, httpMethod, ByteString.copyFrom(json, Charset.defaultCharset()), Timestamp.newBuilder().setSeconds(System.currentTimeMillis() / 1000L + delay).build());
+        var headers = new HashMap<String, String>(){{
+            put("Content-Type", "application/json");
+        }};
+
+        return this.CreateTask(queueId, relativeEndpoint, httpMethod, headers, ByteString.copyFrom(json, Charset.defaultCharset()), Timestamp.newBuilder().setSeconds(System.currentTimeMillis() / 1000L + delay).build());
     }
 }
