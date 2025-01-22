@@ -130,7 +130,7 @@ public class WhatsappBotController {
         }
 
         messageContextContentRepository.save(contentBuilder.build());
-        var schedulerId = schedulerService.ScheduleMessageProcessing(phoneNumber, messageId, );
+        schedulerService.ScheduleMessageProcessing(phoneNumber, messageId);
     }
 
     @PostMapping("/webhook-twilio")
@@ -178,6 +178,6 @@ public class WhatsappBotController {
 
 
         messageContextContentRepository.save(contentBuilder.build());
-        var schedulerId = schedulerService.ScheduleMessageProcessing(phoneNumber, messageId, );
+       schedulerService.ScheduleMessageProcessing(phoneNumber, messageId);
     }
 }
