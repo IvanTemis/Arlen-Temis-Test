@@ -51,11 +51,11 @@ public class CloudTaskClient {
                     .setScheduleTime(scheduleTime)
                     .setHttpRequest(
                             HttpRequest.newBuilder()
-                                    .putAllHeaders(headers)
-                                    .setBody(body)
+                                    //.putAllHeaders(headers)
+                                    //.setBody(body)
                                     .setHttpMethod(httpMethod)
                                     .setUrl(targetUrl)
-                                    .setOidcToken(oidcToken)
+                                    //.setOidcToken(oidcToken)
                                     //.setOauthToken(oauth)
                                     .build());
 
