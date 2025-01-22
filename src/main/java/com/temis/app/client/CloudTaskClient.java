@@ -34,7 +34,7 @@ public class CloudTaskClient {
         }
     }
 
-    public Task CreateTask(String queueId, String relativeEndpoint, HttpMethod httpMethod, Map<String, String> headers, ByteString body, Timestamp scheduleTime) throws IOException {
+    public Task CreateTask(String queueId, String taskName, String relativeEndpoint, HttpMethod httpMethod, Map<String, String> headers, ByteString body, Timestamp scheduleTime) throws IOException {
         log.info("Creating {} task in queue '{}' for endpoint '{}':\n{}\n{}\n{}", httpMethod, queueId, relativeEndpoint,headers,body,scheduleTime);
         try (CloudTasksClient client = CloudTasksClient.create()) {
 
@@ -50,6 +50,7 @@ public class CloudTaskClient {
 
             Task.Builder taskBuilder = Task.newBuilder()
                     .setScheduleTime(scheduleTime)
+                    .setName(taskName)
                     .setHttpRequest(
                             HttpRequest.newBuilder()
                                     .putAllHeaders(headers)
@@ -70,7 +71,7 @@ public class CloudTaskClient {
         }
     }
 
-    public <T> Task CreateTask(String queueId, String relativeEndpoint, HttpMethod httpMethod, T body, Long delay) throws IOException {
+    public <T> Task CreateTask(String queueId, String taskName, String relativeEndpoint, HttpMethod httpMethod, T body, Long delay) throws IOException {
         Gson gson = new Gson();
         String json = gson.toJson(body);
 
@@ -78,6 +79,6 @@ public class CloudTaskClient {
             put("Content-Type", "application/json");
         }};
 
-        return this.CreateTask(queueId, relativeEndpoint, httpMethod, headers, ByteString.copyFrom(json, Charset.defaultCharset()), Timestamp.newBuilder().setSeconds(System.currentTimeMillis() / 1000L + delay).build());
+        return this.CreateTask(queueId, taskName, relativeEndpoint, httpMethod, headers, ByteString.copyFrom(json, Charset.defaultCharset()), Timestamp.newBuilder().setSeconds(System.currentTimeMillis() / 1000L + delay).build());
     }
 }

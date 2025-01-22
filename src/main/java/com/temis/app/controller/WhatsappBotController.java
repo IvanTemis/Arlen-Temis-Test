@@ -83,7 +83,7 @@ public class WhatsappBotController {
         //Así que si nos estamos tomando un rato en procesarlo puede que nos reenvíe el mensaje
         var result = messageContextContentRepository.findByMessageId(messageId);
 
-        if(!result.isEmpty()) return;
+        if(result.isPresent()) return;
 
         var phoneNumber = "+" + message.from();
         var nickName = message.contacts() != null ? message.contacts().get(0).profile().name() : "UNKNOWN";
@@ -130,7 +130,7 @@ public class WhatsappBotController {
         }
 
         messageContextContentRepository.save(contentBuilder.build());
-        schedulerService.ScheduleMessageProcessing(phoneNumber);
+        var schedulerId = schedulerService.ScheduleMessageProcessing(phoneNumber, messageId, );
     }
 
     @PostMapping("/webhook-twilio")
@@ -161,9 +161,11 @@ public class WhatsappBotController {
             messageContextRepository.save(context);
         }
 
+        String messageId = "twilio:" + SmsMessageSid;
+
         var contentBuilder = MessageContextContentEntity.builder()
                 .context(context)
-                .messageId("twilio:" + SmsMessageSid)
+                .messageId(messageId)
                 .body(userMessage)
                 .request(new HashMap<>(requestBody));
 
@@ -174,7 +176,8 @@ public class WhatsappBotController {
 
         }
 
+
         messageContextContentRepository.save(contentBuilder.build());
-        schedulerService.ScheduleMessageProcessing(phoneNumber);
+        var schedulerId = schedulerService.ScheduleMessageProcessing(phoneNumber, messageId, );
     }
 }

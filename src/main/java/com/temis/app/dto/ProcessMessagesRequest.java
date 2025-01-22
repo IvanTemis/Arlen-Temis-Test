@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProcessMessagesRequest {
     private String phoneNumber;
+    private String messageId;
 }

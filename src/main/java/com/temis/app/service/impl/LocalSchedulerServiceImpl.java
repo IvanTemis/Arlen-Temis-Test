@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import java.util.concurrent.*;
 
@@ -26,7 +27,7 @@ public class LocalSchedulerServiceImpl implements SchedulerService {
     }
 
     @Override
-    public void ScheduleMessageProcessing(String phoneNumber) {
+    public void ScheduleMessageProcessing(String phoneNumber, String messageId) {
         log.info("Actualizando scheduler para {}.", phoneNumber);
 
         ScheduledFuture<?> previousTimer = userTimers.get(phoneNumber);
@@ -42,6 +43,8 @@ public class LocalSchedulerServiceImpl implements SchedulerService {
             }
         }, 10, TimeUnit.SECONDS);
         userTimers.put(phoneNumber, timer);
+
+        //return "Local:" + phoneNumber + ":" + messageId;
     }
 
     @Override
