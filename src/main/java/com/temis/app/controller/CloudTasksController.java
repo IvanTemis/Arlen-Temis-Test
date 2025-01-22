@@ -73,8 +73,8 @@ public class CloudTasksController {
             log.warn("Se intentó procesar un mensaje ya procesado con ID {}", messageId);
             return;
         }
-
-        if(!context.getMessageContents().getLast().getMessageId().equals(messageId)){
+        var contents = context.getMessageContents();
+        if(!contents.get(contents.size() - 1).getMessageId().equals(messageId)){
             log.info("Saltando el llamado a procesamiento del mensaje '{}' porque no es el mensaje final de la cadena.", messageId);
             return;
         }
