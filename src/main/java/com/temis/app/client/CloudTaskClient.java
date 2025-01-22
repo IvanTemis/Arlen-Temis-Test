@@ -75,6 +75,6 @@ public class CloudTaskClient {
             put("Content-Type", "application/json");
         }};
 
-        return this.CreateTask(queueId, relativeEndpoint, httpMethod, headers, ByteString.copyFrom(json, Charset.defaultCharset()), Timestamp.newBuilder().setSeconds(System.currentTimeMillis() / 1000L + delay).build());
+        return this.CreateTask(queueId, relativeEndpoint, httpMethod, headers, ByteString.copyFrom(json, Charset.defaultCharset()), Timestamp.newBuilder().setSeconds(/*System.currentTimeMillis() / 1000L +*/ delay).build());
     }
 }
