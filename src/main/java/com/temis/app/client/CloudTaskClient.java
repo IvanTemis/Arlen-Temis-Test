@@ -40,10 +40,12 @@ public class CloudTaskClient {
 
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
 
+            String targetUrl = serviceUrl + relativeEndpoint;
+
             // Add your service account email to construct the OIDC token.
             // in order to add an authentication header to the request.
-            var oauthToken =
-                    OAuthToken.newBuilder().setServiceAccountEmail(serviceAccountEmail);
+            var oidcToken =  OidcToken.newBuilder().setAudience(targetUrl).setServiceAccountEmail(serviceAccountEmail);
+            //var oauth = OAuthToken.newBuilder().setServiceAccountEmail(serviceAccountEmail);
 
             Task.Builder taskBuilder = Task.newBuilder()
                     .setScheduleTime(scheduleTime)
@@ -52,11 +54,16 @@ public class CloudTaskClient {
                                     .putAllHeaders(headers)
                                     .setBody(body)
                                     .setHttpMethod(httpMethod)
-                                    .setOauthToken(oauthToken)
-                                    .setUrl(serviceUrl + relativeEndpoint)
+                                    .setUrl(targetUrl)
+                                    .setOidcToken(oidcToken)
+                                    //.setOauthToken(oauth)
                                     .build());
 
-            return client.createTask(queuePath, taskBuilder.build());
+            var task = client.createTask(queuePath, taskBuilder.build());
+
+            log.info("Created task {}", task.getName());
+
+            return task;
         }
     }
 
