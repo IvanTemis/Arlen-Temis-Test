@@ -49,8 +49,12 @@ public class CloudTasksController {
                 log.warn("Se intentó procesar un una tarea ya completada '{}'", taskName);
                 return;
             }
-            case CANCELLED -> {
+            case CANCELLED, NOT_FOUND, ERROR -> {
                 log.warn("Se intentó procesar un una tarea ya cancelada '{}'", taskName);
+                return;
+            }
+            case SKIPPED -> {
+                log.warn("Se intentó procesar un una tarea ya saltada '{}'", taskName);
                 return;
             }
             default -> {}
@@ -71,11 +75,15 @@ public class CloudTasksController {
 
         if(!context.isActive()){
             log.warn("Se intentó procesar un mensaje ya procesado con ID {}", messageId);
+            pendingSchedule.setState(ScheduledProcessState.SKIPPED);
+            scheduledProcessRepository.save(pendingSchedule);
             return;
         }
         var contents = context.getMessageContents();
         if(!contents.get(contents.size() - 1).getMessageId().equals(messageId)){
             log.info("Saltando el llamado a procesamiento del mensaje '{}' porque no es el mensaje final de la cadena.", messageId);
+            pendingSchedule.setState(ScheduledProcessState.SKIPPED);
+            scheduledProcessRepository.save(pendingSchedule);
             return;
         }
 
@@ -83,11 +91,12 @@ public class CloudTasksController {
 
         try {
             messageProcessingService.ProcessAccumulatedMessages(phoneNumber);
+            pendingSchedule.setState(ScheduledProcessState.DONE);
         } catch (Exception e) {
+            pendingSchedule.setState(ScheduledProcessState.PROCESS_ERROR);
             log.error("Error durante procesamiento de mensajes acumulados para " + phoneNumber, e);
         }
-        
-        pendingSchedule.setState(ScheduledProcessState.DONE);
+
         scheduledProcessRepository.save(pendingSchedule);
     }
 }

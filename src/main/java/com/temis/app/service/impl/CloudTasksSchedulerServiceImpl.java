@@ -30,18 +30,25 @@ public class CloudTasksSchedulerServiceImpl implements SchedulerService {
     public void ScheduleMessageProcessing(String phoneNumber, String messageId) {
         log.info("Actualizando scheduler para {}.", phoneNumber);
 
-        try{
+
             var pendingSchedules = scheduledProcessRepository.findByParentAndStateAndTypeAndSchedulerTypeOrderByCreatedDateAsc(phoneNumber, ScheduledProcessState.PENDING, ScheduledProcessType.MESSAGE_RESPONSE, ScheduledProcessSchedulerType.GCLOUD_TASKS);
 
             for (ScheduledProcessEntity pendingSchedule : pendingSchedules) {
-                cloudTaskClient.DeleteTask(pendingSchedule.getName());
-                pendingSchedule.setState(ScheduledProcessState.CANCELLED);
+                try {
+                    cloudTaskClient.DeleteTask(pendingSchedule.getName());
+                    log.info("Se canceló la tarea '" + pendingSchedule.getName() + "' de procesamiento de mensajes para " + phoneNumber);
+                    pendingSchedule.setState(ScheduledProcessState.CANCELLED);
+                } catch (com.google.api.gax.rpc.NotFoundException e) {
+                    pendingSchedule.setState(ScheduledProcessState.NOT_FOUND);
+                    log.warn("No se encontró la tarea '" + pendingSchedule.getName() + "' de procesamiento de mensajes para " + phoneNumber);
+                }
+                catch (Exception e) {
+                    pendingSchedule.setState(ScheduledProcessState.ERROR);
+                    log.error("Error al cancelar tarea '" + pendingSchedule.getName() + "' de procesamiento de mensajes para " + phoneNumber, e);
+                }
             }
             scheduledProcessRepository.saveAll(pendingSchedules);
-        }
-        catch (Exception e) {
-            log.error("Error al cancelar procesamiento de mensajes para " + phoneNumber, e);
-        }
+
 
 
         try{
