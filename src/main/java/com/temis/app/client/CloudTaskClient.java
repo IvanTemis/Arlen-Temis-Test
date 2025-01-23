@@ -50,7 +50,7 @@ public class CloudTaskClient {
 
             Task.Builder taskBuilder = Task.newBuilder()
                     .setScheduleTime(scheduleTime)
-                    .setName("projects/" + projectId + "/locations/" + locationId + "/queues/" + queueId + "/tasks/" + taskName)
+                    .setName("projects/" + projectId + "/locations/" + locationId + "/queues/" + queueId + "/tasks/" + taskName.replaceAll("[^A-Za-z0-9\\-_]","_"))
                     .setHttpRequest(
                             HttpRequest.newBuilder()
                                     .putAllHeaders(headers)
