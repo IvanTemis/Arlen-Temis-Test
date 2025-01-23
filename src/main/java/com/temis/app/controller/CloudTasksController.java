@@ -35,7 +35,7 @@ public class CloudTasksController {
     @PostMapping("/processMessages")
     public void processMessages(@RequestHeader("x-cloudtasks-taskname") String taskName, @RequestBody ProcessMessagesRequest processMessagesRequest) {
 
-        var pendingScheduleOptional = scheduledProcessRepository.findByName(taskName);
+        var pendingScheduleOptional = scheduledProcessRepository.findByNameEndingWithAndTypeAndSchedulerType(taskName, ScheduledProcessType.MESSAGE_RESPONSE, ScheduledProcessSchedulerType.GCLOUD_TASKS);
 
         if(pendingScheduleOptional.isEmpty()){
             log.error("Se intentó procesar un una tarea que no se encontró en los registros '{}'", taskName);

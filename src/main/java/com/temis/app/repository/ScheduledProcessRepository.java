@@ -14,5 +14,5 @@ import java.util.Optional;
 @Repository
 public interface ScheduledProcessRepository extends CrudRepository<ScheduledProcessEntity, Long> {
     List<ScheduledProcessEntity> findByParentAndStateAndTypeAndSchedulerTypeOrderByCreatedDateAsc(String parent, ScheduledProcessState state, ScheduledProcessType type, ScheduledProcessSchedulerType schedulerType);
-    Optional<ScheduledProcessEntity> findByName(String name);
+    Optional<ScheduledProcessEntity> findByNameEndingWithAndTypeAndSchedulerType(String name, ScheduledProcessType type, ScheduledProcessSchedulerType schedulerType );
 }
