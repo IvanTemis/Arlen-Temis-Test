@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Component
 public class ServiceEntityState extends  StateWithUserTemplate{
@@ -49,7 +48,7 @@ public class ServiceEntityState extends  StateWithUserTemplate{
                     .description("Nuevo servicio para el usuario: " + user.getSuitableName())
                     .phoneNumber(phoneNumber)
                     .isActive(true)
-                    .creationDate(Timestamp.from(Instant.now()))
+                    .createdDate(Timestamp.from(Instant.now()))
                     .priority(1)
                     .user(user)
                     .requirementEntities(new ArrayList<>())

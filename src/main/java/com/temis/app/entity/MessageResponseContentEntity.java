@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;

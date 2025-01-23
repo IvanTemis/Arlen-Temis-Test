@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -57,7 +58,7 @@ public class NotaryDocumentEntity {
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private Timestamp creationDate;
+    private Date createdDate;
 
     @Column(nullable = false)
     private Boolean isActive;

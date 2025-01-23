@@ -6,7 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @Entity
@@ -54,13 +54,13 @@ public class NotaryEntity {
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-    private Timestamp lastModifiedDate;
+    private Date lastModifiedDate;
 
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private Timestamp creationDate;
+    private Date createdDate;
 
     @Column(nullable = false)
-    private Timestamp lastUpdateDate;
+    private Date lastUpdateDate;
 }

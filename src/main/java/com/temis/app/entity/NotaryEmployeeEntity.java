@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.sql.Timestamp;
+import java.util.Date;
 
 @Data
 @Entity
@@ -35,7 +36,7 @@ public class NotaryEmployeeEntity {
     @Column(nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-    private Timestamp creationDate;
+    private Date createdDate;
 
     @Column(nullable = false)
     private Boolean isActive;

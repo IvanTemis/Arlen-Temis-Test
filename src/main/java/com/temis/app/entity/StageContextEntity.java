@@ -6,7 +6,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -36,7 +35,7 @@ public class StageContextEntity {
 
     @Column(nullable = false, updatable = false)
     @CreatedDate
-    private Date creationDate;
+    private Date createdDate;
 
     @Column(nullable = false)
     private Boolean isActive;

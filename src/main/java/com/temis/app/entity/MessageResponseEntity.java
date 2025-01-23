@@ -1,6 +1,5 @@
 package com.temis.app.entity;
 
-import com.temis.app.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

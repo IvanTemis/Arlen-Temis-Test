@@ -9,7 +9,6 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.annotation.Nullable;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class ServiceEntity {
 
     @Column(nullable = false, updatable = false)
     @CreatedDate
-    private Date creationDate;
+    private Date createdDate;
 
     @Column(nullable = false)
     private Boolean isActive;
