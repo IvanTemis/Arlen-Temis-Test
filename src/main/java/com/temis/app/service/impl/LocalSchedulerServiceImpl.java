@@ -1,5 +1,7 @@
 package com.temis.app.service.impl;
 
+import com.temis.app.entity.UserEntity;
+import com.temis.app.service.ClientVirtualAssistantService;
 import com.temis.app.service.MessageProcessingService;
 import com.temis.app.service.SchedulerService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ public class LocalSchedulerServiceImpl implements SchedulerService {
 
     @Autowired
     private MessageProcessingService messageProcessingService;
+    @Autowired
+    private ClientVirtualAssistantService clientVirtualAssistantService;
 
     @PostConstruct
     private void ReschedulePending(){
@@ -45,6 +49,19 @@ public class LocalSchedulerServiceImpl implements SchedulerService {
         userTimers.put(phoneNumber, timer);
 
         //return "Local:" + phoneNumber + ":" + messageId;
+    }
+
+    @Override
+    public void ScheduleDraftGeneration(String inputJson, UserEntity user) throws Exception {
+        log.info("Generando scheduler para generación de Draft para {}.", user.getSuitableName());
+        scheduler.schedule(() -> {
+            //Generamos el borrador de alta constitutiva
+            try {
+                String draft = clientVirtualAssistantService.generateCompanyIncorporationDraft(inputJson, user);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }, 0, TimeUnit.SECONDS);
     }
 
     @Override

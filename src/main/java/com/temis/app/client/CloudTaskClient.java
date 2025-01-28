@@ -7,6 +7,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ public class CloudTaskClient {
         }
     }
 
-    public Task CreateTask(String queueId, String taskName, String relativeEndpoint, HttpMethod httpMethod, Map<String, String> headers, ByteString body, Timestamp scheduleTime) throws IOException {
+    public Task CreateTask(String queueId, @Nullable String taskName, String relativeEndpoint, HttpMethod httpMethod, Map<String, String> headers, ByteString body, Timestamp scheduleTime) throws IOException {
         log.info("Creating {} task in queue '{}' for endpoint '{}':\n{}\n{}\n{}", httpMethod, queueId, relativeEndpoint,headers,body,scheduleTime);
         try (CloudTasksClient client = CloudTasksClient.create()) {
 
@@ -50,7 +51,6 @@ public class CloudTaskClient {
 
             Task.Builder taskBuilder = Task.newBuilder()
                     .setScheduleTime(scheduleTime)
-                    .setName("projects/" + projectId + "/locations/" + locationId + "/queues/" + queueId + "/tasks/" + taskName.replaceAll("[^A-Za-z0-9\\-_]","_"))
                     .setHttpRequest(
                             HttpRequest.newBuilder()
                                     .putAllHeaders(headers)
@@ -60,6 +60,10 @@ public class CloudTaskClient {
                                     //.setOidcToken(oidcToken)
                                     //.setOauthToken(oauth)
                                     .build());
+
+            if(taskName != null && !taskName.isEmpty()){
+                taskBuilder.setName("projects/" + projectId + "/locations/" + locationId + "/queues/" + queueId + "/tasks/" + taskName.replaceAll("[^A-Za-z0-9\\-_]","_"));
+            }
 
             log.info("Creating task...");
 
@@ -71,7 +75,7 @@ public class CloudTaskClient {
         }
     }
 
-    public <T> Task CreateTask(String queueId, String taskName, String relativeEndpoint, HttpMethod httpMethod, T body, Long delay) throws IOException {
+    public <T> Task CreateTask(String queueId, @Nullable String taskName, String relativeEndpoint, HttpMethod httpMethod, T body, Long delay) throws IOException {
         Gson gson = new Gson();
         String json = gson.toJson(body);
 

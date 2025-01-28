@@ -31,6 +31,7 @@ public class ChatAIClient {
                 .setMaxOutputTokens(2048)
                 .setTemperature(0.5F)
                 .setTopP(0.9F)
+                .setTopK(1F)
                 .build();
 
         List<SafetySetting> safetySettings = Arrays.asList(
