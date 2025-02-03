@@ -3,12 +3,18 @@ package com.temis.app.service.impl;
 import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.temis.app.client.ChatAIClient;
+import com.temis.app.client.CloudStorageClient;
+import com.temis.app.config.properties.CloudConfigProperties;
 import com.temis.app.entity.*;
 import com.temis.app.manager.AgentManager;
 import com.temis.app.repository.VertexAiContentRepository;
 import com.temis.app.utils.VertexAIUtils;
+import com.temis.app.utils.WordDocumentFormatter;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +27,12 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
     
     @Autowired
     AgentManager agentManager;
+    
+    @Autowired
+    private CloudConfigProperties cloudConfigProperties;
+
+    @Autowired
+    private CloudStorageClient cloudStorageClient;
 
     @Autowired
     VertexAiContentRepository vertexAiContextRepository;
@@ -48,29 +60,21 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
    
     @Override
     public String generateCompanyIncorporationDraft(String inputJson, UserEntity user) throws Exception {
-    String agentId = "company-incorporation-agent";
-    ChatAIClient chatAIClient = agentManager.getAgent(agentId);
+        // Ruta del archivo en el bucket
+        String templateUri = "gs://" + cloudConfigProperties.getStorage().getBucketName() + "/drafts/machote.docx";
 
-    Content content = VertexAIUtils.createTextContent(
-        "Generar borrador para alta constitutiva basado en JSON:\n" + inputJson
-    );
+        // Leer el machote como bytes desde el bucket
+        byte[] templateBytes = cloudStorageClient.ReadFileBytes(templateUri);
 
-    StringBuilder draftBuilder = new StringBuilder();
+        // Generar el documento formateado usando el JSON proporcionado
+        WordDocumentFormatter formatter = new WordDocumentFormatter();
+        byte[] formattedDocument = formatter.createFormattedDocument(templateBytes, inputJson);
 
-    var responseStream = chatAIClient.startStreaming(content, 
-        "Por favor genera un borrador para la alta constitutiva de una empresa utilizando el siguiente contexto:\n" +
-        inputJson + "\n\n" +
-        "Asegúrate de incluir la información relevante como el tipo de sociedad, objeto social, socios, ubicación y denominaciones."
-    );
 
-    responseStream.stream().forEach(response -> {
-        draftBuilder.append(ResponseHandler.getText(response));
-    });
+      draftEmailService.sendDraftByEmailWithAttachment(inputJson, formattedDocument, "Borrador_Constitutiva.docx", user.getEmail());
 
-    String draftText = draftBuilder.toString();
+        log.info("Documento generado y enviado exitosamente a {}", user.getEmail());
 
-    draftEmailService.sendDraftByEmail(inputJson,draftText, user.getEmail());
-
-    return draftText;
-}
+        return "Documento generado y enviado exitosamente.";
+    }
 }
