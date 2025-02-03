@@ -1,5 +1,6 @@
 package com.temis.app.controller;
 
+import com.temis.app.dto.GenerateDraftRequest;
 import com.temis.app.dto.ProcessMessagesRequest;
 import com.temis.app.entity.ScheduledProcessEntity;
 import com.temis.app.model.ScheduledProcessSchedulerType;
@@ -7,6 +8,8 @@ import com.temis.app.model.ScheduledProcessState;
 import com.temis.app.model.ScheduledProcessType;
 import com.temis.app.repository.MessageContextContentRepository;
 import com.temis.app.repository.ScheduledProcessRepository;
+import com.temis.app.repository.UserRepository;
+import com.temis.app.service.ClientVirtualAssistantService;
 import com.temis.app.service.MessageProcessingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +27,25 @@ public class CloudTasksController {
     @Autowired
     private MessageProcessingService messageProcessingService;
 
+    @Autowired
+    private ClientVirtualAssistantService clientVirtualAssistantService;
+
 
     @Autowired
     private MessageContextContentRepository messageContextContentRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ScheduledProcessRepository scheduledProcessRepository;
 
 
-    @PostMapping("/processMessages")
-    public void processMessages(@RequestHeader("x-cloudtasks-taskname") String taskName, @RequestBody ProcessMessagesRequest processMessagesRequest) {
-
-        var pendingScheduleOptional = scheduledProcessRepository.findByNameEndingWithAndTypeAndSchedulerType(taskName, ScheduledProcessType.MESSAGE_RESPONSE, ScheduledProcessSchedulerType.GCLOUD_TASKS);
+    private ScheduledProcessEntity TaskGate(String taskName, ScheduledProcessType scheduledProcessType){
+        var pendingScheduleOptional = scheduledProcessRepository.findByNameEndingWithAndTypeAndSchedulerType(taskName, scheduledProcessType, ScheduledProcessSchedulerType.GCLOUD_TASKS);
 
         if(pendingScheduleOptional.isEmpty()){
             log.error("Se intentó procesar un una tarea que no se encontró en los registros '{}'", taskName);
-            return;
+            return null;
         }
 
         var pendingSchedule = pendingScheduleOptional.get();
@@ -47,17 +53,28 @@ public class CloudTasksController {
         switch (pendingSchedule.getState()){
             case DONE -> {
                 log.warn("Se intentó procesar un una tarea ya completada '{}'", taskName);
-                return;
+                return null;
             }
             case CANCELLED, NOT_FOUND, ERROR -> {
                 log.warn("Se intentó procesar un una tarea ya cancelada '{}'", taskName);
-                return;
+                return null;
             }
             case SKIPPED -> {
                 log.warn("Se intentó procesar un una tarea ya saltada '{}'", taskName);
-                return;
+                return null;
             }
             default -> {}
+        }
+
+        return pendingSchedule;
+    }
+
+
+    @PostMapping("/processMessages")
+    public void processMessages(@RequestHeader("x-cloudtasks-taskname") String taskName, @RequestBody ProcessMessagesRequest processMessagesRequest) {
+        var pendingSchedule = TaskGate(taskName, ScheduledProcessType.MESSAGE_RESPONSE);
+        if(pendingSchedule == null){
+            return;
         }
 
         var messageId = processMessagesRequest.getMessageId();
@@ -95,6 +112,33 @@ public class CloudTasksController {
         } catch (Exception e) {
             pendingSchedule.setState(ScheduledProcessState.PROCESS_ERROR);
             log.error("Error durante procesamiento de mensajes acumulados para " + phoneNumber, e);
+        }
+
+        scheduledProcessRepository.save(pendingSchedule);
+    }
+
+    @PostMapping("/generateDraft")
+    public void generateDraft(@RequestHeader("x-cloudtasks-taskname") String taskName, @RequestBody GenerateDraftRequest generateDraftRequest) {
+
+        var pendingSchedule = TaskGate(taskName, ScheduledProcessType.DRAFT_GENERATION);
+        if(pendingSchedule == null){
+            return;
+        }
+
+        var optionalUser = userRepository.findById(generateDraftRequest.getUserId());
+
+        if(optionalUser.isEmpty()){
+            log.error("Se intentó generar draft para usuario inexistente con id '{}'", generateDraftRequest.getUserId());
+            return;
+        }
+        var user = optionalUser.get();
+        
+        try {
+            String draft = clientVirtualAssistantService.generateCompanyIncorporationDraft(generateDraftRequest.getJson(), user);
+            pendingSchedule.setState(ScheduledProcessState.DONE);
+        } catch (Exception e) {
+            pendingSchedule.setState(ScheduledProcessState.PROCESS_ERROR);
+            log.error("Error durante la generación del Draft para " + user.getPhoneNumber(), e);
         }
 
         scheduledProcessRepository.save(pendingSchedule);

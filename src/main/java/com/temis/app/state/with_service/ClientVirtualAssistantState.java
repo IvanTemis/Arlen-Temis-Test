@@ -12,6 +12,7 @@ import com.temis.app.model.VertexAiRole;
 import com.google.api.services.calendar.model.Event;
 import com.temis.app.repository.StageContextRepository;
 import com.temis.app.service.ClientVirtualAssistantService;
+import com.temis.app.service.SchedulerService;
 import com.temis.app.utils.TextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,9 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
     Pattern jsonPattern = Pattern.compile("(\\[*\\{(?:.*|[\\n\\t\\r]*)+?\\}\\]*)",
             Pattern.CASE_INSENSITIVE);
 
+
+    @Autowired
+    private SchedulerService schedulerService;
     @Autowired
     private ClientVirtualAssistantService clientVirtualAssistantService;
 
@@ -114,35 +118,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                     MessageParts messageParts = ExtractEndMessage(result, ServiceStage.DOCUMENT_COLLECTION, ServiceStage.COMPANY_INCORPORATION, service);
                     result = messageParts.getText();
 
-                    //Generamos el borrador de alta constitutiva
-                    String draft = clientVirtualAssistantService.generateCompanyIncorporationDraft(messageParts.getJson(), user);
-                    log.info("Borrador generado: {}", draft);
-                    log.info("Borrador enviado por correo al usuario: {}", user.getEmail());
-
-                    //TODO Que esta madre jale, o que al menos no tumbe todo el proceso
-                    /* Creamos un evento en el calendario
-                    GoogleCalendarClient calendarClient = new GoogleCalendarClient("Temis Application");
-                    String startDateTime = java.time.LocalDateTime.now().plusDays(1).toString();
-                    String endDateTime = java.time.LocalDateTime.now().plusDays(1).plusHours(1).toString();
-
-                    String[] additionalAttendees = {
-                        "ivan@temislegal.ai",
-                        "alex@temislegal.ai",
-                        "diego@temislegal.ai",
-                        "gabriel@temislegal.ai"
-                    };
-
-                    Event event = calendarClient.createEvent(
-                            "ivan.cantu.garcia@gmail.com",
-                            "Revisión del Borrador de Alta Constitutiva",
-                            "Revisar el borrador de alta constitutiva",
-                            "Virtual (Zoom/Google Meet)",
-                            startDateTime,
-                            endDateTime,
-                            additionalAttendees
-                    );
-
-                    log.info("Evento creado en el calendario: {}", event.getHtmlLink());*/
+                    schedulerService.ScheduleDraftGeneration(messageParts.getJson(), user);
                 }
             }
             case COMPANY_INCORPORATION -> {

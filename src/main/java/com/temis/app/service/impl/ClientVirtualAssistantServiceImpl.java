@@ -1,10 +1,12 @@
 package com.temis.app.service.impl;
 
+import com.google.api.services.calendar.model.Event;
 import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.config.properties.CloudConfigProperties;
+import com.temis.app.client.GoogleCalendarClient;
 import com.temis.app.entity.*;
 import com.temis.app.manager.AgentManager;
 import com.temis.app.repository.VertexAiContentRepository;
@@ -24,7 +26,7 @@ import com.temis.app.service.ClientVirtualAssistantService;
 @Service
 @Slf4j
 public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistantService {
-    
+
     @Autowired
     AgentManager agentManager;
     
@@ -57,7 +59,8 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
         return ResponseHandler.getText(response);
     }
 
-   
+
+    //TODO: Este es el mejor lugar para esta lógica?
     @Override
     public String generateCompanyIncorporationDraft(String inputJson, UserEntity user) throws Exception {
         // Ruta del archivo en el bucket
@@ -76,5 +79,6 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
         log.info("Documento generado y enviado exitosamente a {}", user.getEmail());
 
         return "Documento generado y enviado exitosamente.";
+
     }
 }
