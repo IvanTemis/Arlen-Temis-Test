@@ -6,6 +6,7 @@ import com.temis.app.service.MessageProcessingService;
 import com.temis.app.service.SchedulerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +21,9 @@ public class LocalSchedulerServiceImpl implements SchedulerService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final ConcurrentHashMap<String, ScheduledFuture<?>> userTimers = new ConcurrentHashMap<>();
 
-    @Autowired
+    @Autowired @Lazy
     private MessageProcessingService messageProcessingService;
-    @Autowired
+    @Autowired @Lazy
     private ClientVirtualAssistantService clientVirtualAssistantService;
 
     @PostConstruct

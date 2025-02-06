@@ -8,6 +8,8 @@ public enum ServiceStage {
     ANY(null),
     SOCIETY_IDENTIFICATION("society-identification-agent"),
     DOCUMENT_COLLECTION("document-collection-agent"),
+    ORGANIZATIONAL_STRUCTURE("organizational-structure-agent"),
+    PAYMENT_COLLECTION("payment-collection-agent"),
     COMPANY_INCORPORATION("company-incorporation-agent"),
     ;
 
