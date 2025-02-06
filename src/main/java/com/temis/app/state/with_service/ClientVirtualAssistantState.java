@@ -86,36 +86,43 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
         }
 
         String result = "You shouldn't be here.";
+        String userContext = "\nContexto de la conversación:\n" +
+                "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
+                "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
+                "\t- Fecha y Hora de la última interacción: " +
+                (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n";
+        var serviceStage = service.getServiceStage();
 
-        switch (service.getServiceStage()) {
+        switch (serviceStage) {
             case SOCIETY_IDENTIFICATION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, ServiceStage.SOCIETY_IDENTIFICATION.getAgentId(),
-                        "\nContexto de la conversación:\n" +
-                                "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
-                                "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
-                                "\t- Fecha y Hora de la última interacción: " +
-                                (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n");
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
 
                 if (result.contains(END_STAGE_1)) {
-                    MessageParts messageParts = ExtractEndMessage(result, ServiceStage.SOCIETY_IDENTIFICATION, ServiceStage.DOCUMENT_COLLECTION, service);
+                    MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.DOCUMENT_COLLECTION, service);
                     result = messageParts.getText();
                 }
             }
             case DOCUMENT_COLLECTION -> {
-                var stageContexts = stageContextRepository.findByServiceAndTargetStage(service, ServiceStage.DOCUMENT_COLLECTION).stream()
-                .map(StageContextEntity::getContext)
-                .toList();
-
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, ServiceStage.DOCUMENT_COLLECTION.getAgentId(),
-                        "\nContexto de la conversación:\n" +
-                                "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
-                                "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
-                                "\t- Fecha y Hora de la última interacción: " +
-                                (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n" +
-                                String.join("\\n", stageContexts));
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
 
                 if (result.contains(END_STAGE_1)) {
-                    MessageParts messageParts = ExtractEndMessage(result, ServiceStage.DOCUMENT_COLLECTION, ServiceStage.COMPANY_INCORPORATION, service);
+                    MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.ORGANIZATIONAL_STRUCTURE, service);
+                    result = messageParts.getText();
+                }
+            }
+            case ORGANIZATIONAL_STRUCTURE -> {
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
+
+                if (result.contains(END_STAGE_1)) {
+                    MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.PAYMENT_COLLECTION, service);
+                    result = messageParts.getText();
+                }
+            }
+            case PAYMENT_COLLECTION -> {
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
+
+                if (result.contains(END_STAGE_1)) {
+                    MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.COMPANY_INCORPORATION, service);
                     result = messageParts.getText();
 
                     schedulerService.ScheduleDraftGeneration(messageParts.getJson(), user);

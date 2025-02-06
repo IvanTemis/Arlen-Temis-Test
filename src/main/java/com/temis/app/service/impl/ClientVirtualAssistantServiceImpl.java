@@ -45,7 +45,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
     @Override
     public String respondToUserMessage(Content content, UserEntity user, String agentId, String context) throws Exception {
 
-        var contexts = vertexAiContextRepository.findByUserEntityAndAgentIdOrderByCreatedDateAsc(user, agentId);
+        var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
         var history = VertexAIUtils.VertexAiContentEntityToContent(contexts);
 
