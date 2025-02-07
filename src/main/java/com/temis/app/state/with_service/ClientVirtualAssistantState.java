@@ -139,6 +139,9 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
         for (String sentence : sentences) {
             responseBuilder.addContent(sentence);
         }
+        if(sentences.isEmpty()){
+            responseBuilder.addContent("[(El agente respondió vacío)]");
+        }
     }
 
     private MessageParts ExtractEndMessage(String message, ServiceStage current, ServiceStage next, ServiceEntity service) throws JSONNotFoundException {
