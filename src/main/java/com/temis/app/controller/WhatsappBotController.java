@@ -10,7 +10,6 @@ import com.temis.app.repository.MessageContextContentRepository;
 import com.temis.app.repository.MessageContextRepository;
 import com.temis.app.service.MessageService;
 import com.temis.app.service.SchedulerService;
-import com.temis.app.state.FirstContactState;
 import com.whatsapp.api.domain.webhook.WebHook;
 import com.whatsapp.api.domain.webhook.type.FieldType;
 import com.whatsapp.api.impl.WhatsappBusinessCloudApi;
@@ -25,9 +24,6 @@ import java.util.Map;
 @RequestMapping("/whatsapp-bot")
 @Slf4j
 public class WhatsappBotController {
-
-    @Autowired
-    private FirstContactState firstContactState;
 
     @Autowired
     private MessageService messageService;
