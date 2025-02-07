@@ -160,8 +160,8 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
             result = result.replace(extractedJson, "").replace("```json", "").replace("```", "").trim();
         } else {
-            throw new JSONNotFoundException("Se intentó finalizar la etapa " + current.name() +
-                    " del agente pero no se encontró un JSON válido");
+            /*throw new JSONNotFoundException("Se intentó finalizar la etapa " + current.name() +
+                    " del agente pero no se encontró un JSON válido");*/
         }
 
         return new MessageParts(result, extractedJson);
