@@ -139,6 +139,9 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
         for (String sentence : sentences) {
             responseBuilder.addContent(sentence);
         }
+        if(sentences.isEmpty()){
+            responseBuilder.addContent("[(El agente respondió vacío)]");
+        }
     }
 
     private MessageParts ExtractEndMessage(String message, ServiceStage current, ServiceStage next, ServiceEntity service) throws JSONNotFoundException {
@@ -160,8 +163,8 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
 
             result = result.replace(extractedJson, "").replace("```json", "").replace("```", "").trim();
         } else {
-            throw new JSONNotFoundException("Se intentó finalizar la etapa " + current.name() +
-                    " del agente pero no se encontró un JSON válido");
+            /*throw new JSONNotFoundException("Se intentó finalizar la etapa " + current.name() +
+                    " del agente pero no se encontró un JSON válido");*/
         }
 
         return new MessageParts(result, extractedJson);

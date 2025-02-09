@@ -95,6 +95,10 @@ public class MessageResponseEntity {
         public MessageResponseEntity build(){
             var result = this.hiddenBuild();
 
+            if(responseContents == null){
+                addContent("(debug: respuesta vacía)");
+            }
+
             for (MessageResponseContentEntity responseContent : result.responseContents) {
                 responseContent.setResponse(result);
             }
