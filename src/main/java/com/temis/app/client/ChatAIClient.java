@@ -76,6 +76,8 @@ public class ChatAIClient {
     }
 
     public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String context) throws Exception {
+        UpdatePrompt();
+
         var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(systemInstruction, context));
 
         ChatSession chatSession = model.startChat();
