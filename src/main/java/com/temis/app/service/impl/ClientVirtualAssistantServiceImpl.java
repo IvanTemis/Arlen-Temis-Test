@@ -71,10 +71,13 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
         // Generar el documento formateado usando el JSON proporcionado
         WordDocumentFormatter formatter = new WordDocumentFormatter();
-        byte[] formattedDocument = formatter.createFormattedDocument(templateBytes, inputJson);
+        String cleanJson = inputJson.replace("\"+\"", "");
+        byte[] formattedDocument = formatter.formatDocument(templateBytes, cleanJson);
 
-
-      draftEmailService.sendDraftByEmailWithAttachment(inputJson, formattedDocument, "Borrador_Constitutiva.docx", user.getEmail());
+        //INFO - Para pruebas del machote en local.
+        //Files.write(Paths.get("documento_generado.docx"), formattedDocument);
+     
+        draftEmailService.sendDraftByEmailWithAttachment(inputJson, formattedDocument, "Borrador_Constitutiva.docx", user.getEmail());
 
         log.info("Documento generado y enviado exitosamente a {}", user.getEmail());
 
