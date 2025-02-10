@@ -43,10 +43,11 @@ public class CloudTaskClient {
 
         if(taskName != null) {
             settings.createTaskSettings().retrySettings()
-                    .setMaxAttempts(10)
-                    .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(100))
+                    .setMaxAttempts(20)
+                    .setInitialRetryDelayDuration(Duration.ofMillis(10))
+                    .setMaxRetryDelayDuration(Duration.ofMillis(500))
                     .setRetryDelayMultiplier(1.3d)
-                    .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(2))
+                    .setMaxRpcTimeoutDuration(Duration.ofSeconds(2))
                     .setTotalTimeoutDuration(Duration.ofSeconds(3))
             ;
         }
