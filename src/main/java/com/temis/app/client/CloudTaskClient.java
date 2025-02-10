@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import lombok.extern.slf4j.Slf4j;
+import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -37,7 +38,20 @@ public class CloudTaskClient {
 
     public Task CreateTask(String queueId, @Nullable String taskName, String relativeEndpoint, HttpMethod httpMethod, Map<String, String> headers, ByteString body, Timestamp scheduleTime) throws IOException {
         log.info("Creating {} task in queue '{}' for endpoint '{}':\n{}\n{}\n{}", httpMethod, queueId, relativeEndpoint,headers,body,scheduleTime);
-        try (CloudTasksClient client = CloudTasksClient.create()) {
+
+        var settings = CloudTasksSettings.newBuilder();
+
+        if(taskName != null) {
+            settings.createTaskSettings().retrySettings()
+                    .setMaxAttempts(10)
+                    .setInitialRetryDelay(org.threeten.bp.Duration.ofMillis(100))
+                    .setRetryDelayMultiplier(1.3d)
+                    .setMaxRpcTimeout(org.threeten.bp.Duration.ofSeconds(2))
+                    .setTotalTimeoutDuration(Duration.ofSeconds(3))
+            ;
+        }
+
+        try (CloudTasksClient client = CloudTasksClient.create(settings.build())) {
 
             String queuePath = QueueName.of(projectId, locationId, queueId).toString();
 
