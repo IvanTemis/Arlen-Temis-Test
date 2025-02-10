@@ -92,7 +92,7 @@ public class CloudTasksSchedulerServiceImpl implements SchedulerService {
 
             scheduledProcessRepository.save(scheduledProcess);
         } catch (Exception e) {
-            log.error("Error al programar el procesamiento de mensajes para " + phoneNumber, e);
+            log.error("Error al programar la generación de borradores para " + phoneNumber, e);
         }
     }
 
