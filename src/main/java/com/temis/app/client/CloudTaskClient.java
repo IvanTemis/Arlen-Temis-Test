@@ -47,7 +47,8 @@ public class CloudTaskClient {
                     .setInitialRetryDelayDuration(Duration.ofMillis(10))
                     .setMaxRetryDelayDuration(Duration.ofMillis(500))
                     .setRetryDelayMultiplier(1.3d)
-                    .setMaxRpcTimeoutDuration(Duration.ofSeconds(2))
+                    .setInitialRpcTimeoutDuration(Duration.ofSeconds(10))
+                    .setMaxRpcTimeoutDuration(Duration.ofSeconds(30))
                     .setTotalTimeoutDuration(Duration.ofSeconds(3))
             ;
         }
