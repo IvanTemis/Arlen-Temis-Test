@@ -1,5 +1,7 @@
 package com.temis.app.config;
 
+import com.temis.app.agent.DocumentClassifierAgent;
+import com.temis.app.agent.EmailContentCreatorAgent;
 import com.temis.app.client.*;
 
 import java.io.IOException;
@@ -20,14 +22,6 @@ public class CloudConfig {
         this.cloudConfigProperties = cloudConfigProperties;
     }
 
-    @Bean
-    public VertexAIClient vertexAIClient() throws IOException {
-        return new VertexAIClient(
-                cloudConfigProperties.getProjectId(),
-                cloudConfigProperties.getLocation(),
-                cloudConfigProperties.getVertexai().getModelName()
-        );
-    }
     @Bean
     public CloudTaskClient cloudTaskClient() {
         return new CloudTaskClient(
@@ -54,24 +48,12 @@ public class CloudConfig {
     }
 
     @Bean
-    @DependsOn({"cloudStorageClient"})
-    public DocumentClassifierClient documentClassifierClient(@Autowired CloudStorageClient cloudStorageClient) throws IOException {
-        return new DocumentClassifierClient(
+    public VertexAIClient vertexAIClient() {
+        return new VertexAIClient(
                 cloudConfigProperties.getProjectId(),
                 cloudConfigProperties.getLocation(),
-                cloudConfigProperties.getVertexai().getModelName(),
-                cloudStorageClient
+                cloudConfigProperties.getVertexai().getModelName()
         );
     }
 
-    @Bean
-    @DependsOn({"cloudStorageClient"})
-    public EmailContentCreatorClient emailContentCreatorClient(@Autowired CloudStorageClient cloudStorageClient) throws IOException {
-        return new EmailContentCreatorClient(
-                cloudConfigProperties.getProjectId(),
-                cloudConfigProperties.getLocation(),
-                cloudConfigProperties.getVertexai().getModelName(),
-                cloudStorageClient
-        );
-    }
 }

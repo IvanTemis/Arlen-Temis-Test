@@ -1,9 +1,8 @@
 package com.temis.app.state.with_user;
 
-import com.temis.app.client.ChatAIClient;
 import com.temis.app.client.CloudStorageClient;
-import com.temis.app.client.DocumentClassifierClient;
-import com.temis.app.client.EmailContentCreatorClient;
+import com.temis.app.agent.DocumentClassifierAgent;
+import com.temis.app.agent.EmailContentCreatorAgent;
 import com.temis.app.entity.*;
 import com.temis.app.manager.AgentManager;
 import com.temis.app.repository.MessageResponseRepository;
@@ -33,9 +32,9 @@ public class AdminCommandState extends  StateWithUserTemplate{
     @Autowired
     AgentManager agentManager;
     @Autowired
-    private DocumentClassifierClient documentClassifierClient;
+    private DocumentClassifierAgent documentClassifierAgent;
     @Autowired
-    private EmailContentCreatorClient emailContentCreatorClient;
+    private EmailContentCreatorAgent emailContentCreatorAgent;
 
     @Autowired
     EmailService emailService;
@@ -83,14 +82,7 @@ public class AdminCommandState extends  StateWithUserTemplate{
                 case "!fetchprompt":
                 case "!updateprompt":
                 case "!refreshprompt": {
-                    for (ChatAIClient agent : agentManager.getAllAgents()) {
-                        agent.UpdatePrompt();
-                    }
-                    //TODO: Abstraer UpdatePrompt para que sea compartido por todos los agentes
-                    documentClassifierClient.UpdatePrompt();
-                    emailContentCreatorClient.UpdatePrompt();
-
-                    responseBuilder.addContent("Prompts actualizados exitosamente.");
+                    responseBuilder.addContent("Este comando ya está fuera de uso.");
                 }
                 break;
                 case "!emailtest": {

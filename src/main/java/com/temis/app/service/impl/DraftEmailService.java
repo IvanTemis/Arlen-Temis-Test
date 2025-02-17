@@ -1,11 +1,8 @@
 package com.temis.app.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
-import com.temis.app.client.EmailContentCreatorClient;
+import com.temis.app.agent.EmailContentCreatorAgent;
 import com.temis.app.service.EmailService;
-import com.temis.app.utils.WordDocumentFormatter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +18,12 @@ public class DraftEmailService {
     private EmailService emailService;
 
     @Autowired
-    private EmailContentCreatorClient emailContentCreatorClient;
+    private EmailContentCreatorAgent emailContentCreatorAgent;
 
     public void sendDraftByEmailWithAttachment(String inputJson, byte[] documentBytes, String fileName, String emailAddress) throws Exception {
         emailAddress = (emailAddress == null) ? "ivan@temislegal.ai" : emailAddress; // Fallback para el correo
         
-        var result = emailContentCreatorClient.CreateEmailContent(inputJson);
+        var result = emailContentCreatorAgent.CreateEmailContent(inputJson);
         
         var email = ResponseHandler.getText(result)
                 .replace("```html", "")

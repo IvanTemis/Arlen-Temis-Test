@@ -1,12 +1,10 @@
 package com.temis.app.service.impl;
 
-import com.google.api.services.calendar.model.Event;
 import com.google.cloud.vertexai.api.Content;
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
-import com.temis.app.client.ChatAIClient;
+import com.temis.app.client.VertexAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.config.properties.CloudConfigProperties;
-import com.temis.app.client.GoogleCalendarClient;
 import com.temis.app.entity.*;
 import com.temis.app.manager.AgentManager;
 import com.temis.app.repository.VertexAiContentRepository;
@@ -14,9 +12,6 @@ import com.temis.app.utils.VertexAIUtils;
 import com.temis.app.utils.WordDocumentFormatter;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,8 +46,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content, agentId));
 
-        ChatAIClient chatAIClient = agentManager.getAgent(agentId);
-        var response = chatAIClient.sendMessage(content, history, context);
+        var response = agentManager.sendMessageToAgent(agentId, content, history, context);
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response), agentId));
 

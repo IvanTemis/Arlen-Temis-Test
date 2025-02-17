@@ -1,7 +1,7 @@
 package com.temis.app.service.impl;
 
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
-import com.temis.app.client.DocumentClassifierClient;
+import com.temis.app.agent.DocumentClassifierAgent;
 import com.temis.app.entity.DocumentEntity;
 import com.temis.app.repository.DocumentRepository;
 import com.temis.app.repository.DocumentTypeRepository;
@@ -10,13 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
 @Slf4j
 @Service
 public class DocumentClassificationServiceImpl implements DocumentClassificationService {
     @Autowired
-    private DocumentClassifierClient documentClassifierClient;
+    private DocumentClassifierAgent documentClassifierAgent;
     @Autowired
     private DocumentTypeRepository documentTypeRepository;
     @Autowired
@@ -38,7 +36,7 @@ public class DocumentClassificationServiceImpl implements DocumentClassification
             str.append('\n');
         }
 
-        var response = documentClassifierClient.Classify(document.getPath(), document.getFileType(), str.toString());
+        var response = documentClassifierAgent.Classify(document.getPath(), document.getFileType(), str.toString());
 
         var result = ResponseHandler.getText(response).trim();
 
