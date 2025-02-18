@@ -21,11 +21,13 @@ public class ContextPlaceholderProvider implements PlaceholderProvider {
         Object result = null;
         for (String str : split) {
             if(str.endsWith(")")){
-                var method = parent.getClass().getMethod(str.substring(0, str.indexOf('(')));
+                var method = parent.getClass().getDeclaredMethod(str.substring(0, str.indexOf('(')));
+                method.setAccessible(true);
                 result = method.invoke(parent);
             }
             else{
-                var field = parent.getClass().getField(str);
+                var field = parent.getClass().getDeclaredField(str);
+                field.setAccessible(true);
                 result = field.get(parent);
             }
 

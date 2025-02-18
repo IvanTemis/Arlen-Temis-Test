@@ -26,9 +26,9 @@ public abstract class StateTemplate {
 
     public MessageResponseEntity Evaluate(MessageContextEntity message) throws Exception {
         log.info("Evaluating State {} for Message with Id: {}", this.getClass().getSimpleName(), message.getId());
-        log.debug("Processing {} possible transitions.", _otherStates.size());
+        log.info("Processing {} possible transitions.", _otherStates.size());
         for (var state : _otherStates){
-            log.debug("Checking if should transition into {}.", state.getClass().getSimpleName());
+            log.info("Checking if should transition into {}.", state.getClass().getSimpleName());
             if(state.ShouldTransition(message)){
                 return state.Evaluate(message);
             }

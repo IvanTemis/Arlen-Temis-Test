@@ -30,20 +30,20 @@ public class PlaceholderInjector {
         StringBuilder sb = new StringBuilder();
         var matcher = Pattern.compile(PATTERN).matcher(prompt);
 
-        log.debug("Processing placeholders...");
+        log.info("Processing placeholders...");
         while (matcher.find()){
             var placeholder = matcher.group(1);
-            log.debug("Processing placeholder '{}'...", placeholder);
+            log.info("Processing placeholder '{}'...", placeholder);
             var separatorIndex = placeholder.indexOf(':');
             var prefix = placeholder.substring(2, separatorIndex);
 
             if(providerMap.containsKey(prefix)){
                 var args =  placeholder.substring(separatorIndex + 1, placeholder.length() - 2);
-                log.debug("Found provider '{}' for placeholder '{}' with args {}!", prefix, placeholder, args);
+                log.info("Found provider '{}' for placeholder '{}' with args {}!", prefix, placeholder, args);
 
                 try{
                     var res = providerMap.get(prefix).Evaluate(messageContext,args);
-                    log.debug("Placeholder '{}' resulted in '{}'", placeholder, res);
+                    log.info("Placeholder '{}' resulted in '{}'", placeholder, res);
                     placeholder = res;
                 } catch (Exception e) {
                     log.error("Error while evaluating placeholder '" + placeholder + "'",e);
