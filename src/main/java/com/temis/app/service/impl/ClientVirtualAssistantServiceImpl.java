@@ -38,7 +38,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
     private DraftEmailService draftEmailService;
 
     @Override
-    public String respondToUserMessage(Content content, UserEntity user, String agentId, String context) throws Exception {
+    public String respondToUserMessage(Content content, UserEntity user, String agentId, MessageContextEntity messageContext) throws Exception {
 
         var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
 
@@ -46,7 +46,7 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content, agentId));
 
-        var response = agentManager.sendMessageToAgent(agentId, content, history, context);
+        var response = agentManager.sendMessageToAgent(agentId, content, history, messageContext);
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response), agentId));
 

@@ -58,8 +58,8 @@ public class VertexAIClient {
         this.vertexAi.close();
     }
 
-    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String prompt, String context) throws Exception {
-        var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(prompt, context));
+    public GenerateContentResponse sendMessage(Content message, @Nullable List<Content> history, String prompt) throws Exception {
+        var model =  baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(prompt));
 
         ChatSession chatSession = model.startChat();
 
@@ -74,8 +74,8 @@ public class VertexAIClient {
         }, log);
     }
 
-    public ResponseStream<GenerateContentResponse> startStreaming(Content message, String prompt, String context) throws Exception {
-        var model = baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(prompt, context));
+    public ResponseStream<GenerateContentResponse> startStreaming(Content message, String prompt) throws Exception {
+        var model = baseModel.withSystemInstruction(ContentMaker.fromMultiModalData(prompt));
     
         ChatSession chatSession = model.startChat();
     

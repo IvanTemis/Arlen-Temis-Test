@@ -86,16 +86,11 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
         }
 
         String result = "You shouldn't be here.";
-        String userContext = "\nContexto de la conversación:\n" +
-                "\t- Nombre del usuario: " + user.getSuitableName() + ".\n" +
-                "\t- Fecha y Hora actual: " + java.time.LocalDateTime.now() + ".\n" +
-                "\t- Fecha y Hora de la última interacción: " +
-                (user.getLastInteractionDate() == null ? "Nunca" : user.getLastInteractionDate()) + ".\n";
         var serviceStage = service.getServiceStage();
 
         switch (serviceStage) {
             case SOCIETY_IDENTIFICATION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.DOCUMENT_COLLECTION, service);
@@ -103,7 +98,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 }
             }
             case DOCUMENT_COLLECTION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.ORGANIZATIONAL_STRUCTURE, service);
@@ -111,7 +106,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 }
             }
             case ORGANIZATIONAL_STRUCTURE -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.PAYMENT_COLLECTION, service);
@@ -119,7 +114,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 }
             }
             case PAYMENT_COLLECTION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), userContext);
+                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.COMPANY_INCORPORATION, service);

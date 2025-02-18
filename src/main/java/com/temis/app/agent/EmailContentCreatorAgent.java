@@ -2,6 +2,7 @@ package com.temis.app.agent;
 
 import com.google.cloud.vertexai.api.GenerateContentResponse;
 import com.google.cloud.vertexai.generativeai.ContentMaker;
+import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.manager.AgentManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,6 @@ public class EmailContentCreatorAgent {
     }
 
     public GenerateContentResponse CreateEmailContent(String content) throws Exception {
-        return agentManager.sendMessageToAgent("email-content-creator-agent", ContentMaker.fromMultiModalData(content), List.of(), "");
+        return agentManager.sendSimpleMessageToAgent("email-content-creator-agent", ContentMaker.fromMultiModalData(content));
     }
 }

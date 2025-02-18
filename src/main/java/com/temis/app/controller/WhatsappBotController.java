@@ -4,7 +4,7 @@ import com.temis.app.config.properties.WhatsappApiConfigProperties;
 import com.temis.app.converter.JsonConverter;
 import com.temis.app.entity.MessageContextContentEntity;
 import com.temis.app.entity.MessageContextEntity;
-import com.temis.app.exceptions.AccessForbiddenException;
+import com.temis.app.exception.AccessForbiddenException;
 import com.temis.app.model.MessageSource;
 import com.temis.app.repository.MessageContextContentRepository;
 import com.temis.app.repository.MessageContextRepository;

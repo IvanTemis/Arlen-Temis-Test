@@ -2,6 +2,7 @@ package com.temis.app.service.impl;
 
 import com.google.cloud.vertexai.generativeai.ResponseHandler;
 import com.temis.app.agent.EmailContentCreatorAgent;
+import com.temis.app.entity.MessageContextEntity;
 import com.temis.app.service.EmailService;
 
 import lombok.extern.slf4j.Slf4j;

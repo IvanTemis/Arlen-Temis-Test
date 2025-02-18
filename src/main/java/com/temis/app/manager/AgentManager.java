@@ -7,6 +7,8 @@ import com.temis.app.client.VertexAIClient;
 import com.temis.app.client.CloudStorageClient;
 import com.temis.app.config.properties.CloudConfigProperties;
 
+import com.temis.app.entity.MessageContextEntity;
+import com.temis.app.placeholder.PlaceholderInjector;
 import com.temis.app.service.PromptProviderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,17 +27,24 @@ public class AgentManager {
 
     private final PromptProviderService promptProviderService;
     private final VertexAIClient vertexAIClient;
+    private final PlaceholderInjector placeholderInjector;
 
     @Autowired
-    public AgentManager(PromptProviderService promptProviderService, VertexAIClient vertexAIClient) {
+    public AgentManager(PromptProviderService promptProviderService, VertexAIClient vertexAIClient, PlaceholderInjector placeholderInjector) {
         this.promptProviderService = promptProviderService;
         this.vertexAIClient = vertexAIClient;
+        this.placeholderInjector = placeholderInjector;
     }
 
-    public GenerateContentResponse sendMessageToAgent(String agentId, Content message, @Nullable List<Content> history, String context) throws Exception {
+    public GenerateContentResponse sendSimpleMessageToAgent(String agentId, Content message) throws Exception {
+        var prompt = promptProviderService.GetPromptForAgent(agentId);
+        return vertexAIClient.sendMessage(message, List.of(), prompt);
+    }
+
+    public GenerateContentResponse sendMessageToAgent(String agentId, Content message, @Nullable List<Content> history, MessageContextEntity messageContext) throws Exception {
         var prompt = promptProviderService.GetPromptForAgent(agentId);
 
-        var response = vertexAIClient.sendMessage(message, history, prompt, context);
+        var response = vertexAIClient.sendMessage(message, history, placeholderInjector.Inject(prompt, messageContext));
 
         for (FunctionCall functionCall : ResponseHandler.getFunctionCalls(response)) {
             log.info(functionCall.getName());
