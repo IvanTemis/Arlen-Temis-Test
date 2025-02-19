@@ -5,6 +5,8 @@ import com.temis.app.exception.PlaceholderNotFoundException;
 import com.temis.app.placeholder.PlaceholderProvider;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class ContextPlaceholderProvider implements PlaceholderProvider {
     @Override
@@ -13,11 +15,15 @@ public class ContextPlaceholderProvider implements PlaceholderProvider {
     }
 
     @Override
-    public String Evaluate(MessageContextEntity messageContext, String arguments) throws Exception {
+    public String Evaluate(Map<String, Object> context, String arguments) throws Exception {
+        var sepIndex = arguments.indexOf('.');
+        var contextName = arguments.substring(0, sepIndex);
 
-        var split = arguments.split("\\.");
+        if(!context.containsKey(contextName)) throw new PlaceholderNotFoundException("Placeholder in provider '" + GetPrefix() + "' with arguments '" + arguments + "' not found.");
 
-        Object parent = messageContext;
+        var split = arguments.substring(sepIndex + 1).split("\\.");
+
+        Object parent = context.get(contextName);
         Object result = null;
         for (String str : split) {
             if(str.endsWith(")")){

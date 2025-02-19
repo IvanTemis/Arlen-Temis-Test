@@ -26,7 +26,7 @@ public class PlaceholderInjector {
         }
     }
 
-    public String Inject(String prompt, MessageContextEntity messageContext){
+    public String Inject(String prompt, Map<String, Object> context){
         StringBuilder sb = new StringBuilder();
         var matcher = Pattern.compile(PATTERN).matcher(prompt);
 
@@ -42,7 +42,7 @@ public class PlaceholderInjector {
                 log.info("Found provider '{}' for placeholder '{}' with args {}!", prefix, placeholder, args);
 
                 try{
-                    var res = providerMap.get(prefix).Evaluate(messageContext,args);
+                    var res = providerMap.get(prefix).Evaluate(context,args);
                     log.info("Placeholder '{}' resulted in '{}'", placeholder, res);
                     placeholder = res;
                 } catch (Exception e) {

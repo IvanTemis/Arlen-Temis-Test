@@ -41,10 +41,10 @@ public class AgentManager {
         return vertexAIClient.sendMessage(message, List.of(), prompt);
     }
 
-    public GenerateContentResponse sendMessageToAgent(String agentId, Content message, @Nullable List<Content> history, MessageContextEntity messageContext) throws Exception {
+    public GenerateContentResponse sendMessageToAgent(String agentId, Content message, @Nullable List<Content> history, Map<String, Object> context) throws Exception {
         var prompt = promptProviderService.GetPromptForAgent(agentId);
 
-        var response = vertexAIClient.sendMessage(message, history, placeholderInjector.Inject(prompt, messageContext));
+        var response = vertexAIClient.sendMessage(message, history, placeholderInjector.Inject(prompt, context));
 
         for (FunctionCall functionCall : ResponseHandler.getFunctionCalls(response)) {
             log.info(functionCall.getName());

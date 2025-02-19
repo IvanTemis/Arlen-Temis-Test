@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import com.temis.app.service.ClientVirtualAssistantService;
 
+import java.util.HashMap;
+
 @Service
 @Slf4j
 public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistantService {
@@ -46,7 +48,10 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content, agentId));
 
-        var response = agentManager.sendMessageToAgent(agentId, content, history, messageContext);
+        var response = agentManager.sendMessageToAgent(agentId, content, history, new HashMap<>(){{
+            put("messageContext", messageContext);
+            put("user", messageContext.getUserEntity());
+        }});
 
         vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response), agentId));
 

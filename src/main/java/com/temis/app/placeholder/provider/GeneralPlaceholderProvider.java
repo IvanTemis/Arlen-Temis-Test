@@ -5,6 +5,8 @@ import com.temis.app.exception.PlaceholderNotFoundException;
 import com.temis.app.placeholder.PlaceholderProvider;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class GeneralPlaceholderProvider implements PlaceholderProvider {
     @Override
@@ -13,7 +15,7 @@ public class GeneralPlaceholderProvider implements PlaceholderProvider {
     }
 
     @Override
-    public String Evaluate(MessageContextEntity messageContext, String arguments) throws PlaceholderNotFoundException {
+    public String Evaluate(Map<String, Object> context, String arguments) throws PlaceholderNotFoundException {
         switch (arguments){
             case "now", "today" -> {
                 return java.time.LocalDateTime.now().toString();
