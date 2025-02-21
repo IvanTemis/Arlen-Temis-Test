@@ -116,7 +116,14 @@ public class CompanyIncorporationController {
         + "\"dia\": \"06\","
         + "\"mes\": \"Febrero\","
         + "\"ano\": \"2025\","
-        + "\"tipo_sociedad\": \"Sociedad de Responsabilidad Limitada (S. de R.L.)\","
+
+        + "\"tipo_sociedad\": \"Sociedad Anónima Promotora de Inversión (S.A.P.I.)\","
+        + "\"codigo_sociedad\": \"SAPI\","
+
+        /* + "\"tipo_sociedad\": \"Sociedad Anónima de Capital Variable (S.A. de C.V.)\","
+        + "\"codigo_sociedad\": \"SA\"," */
+
+
         + "\"objeto_social\": \"Venta de equipo de cocina\","
         + "\"numero_socios\": 2,"
         + "\"capital_social\": {"
