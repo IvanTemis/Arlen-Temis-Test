@@ -21,7 +21,7 @@ public class EmailContentCreatorAgent {
         this.agentManager = agentManager;
     }
 
-    public GenerateContentResponse CreateEmailContent(String content) throws Exception {
+    public String CreateEmailContent(String content) throws Exception {
         return agentManager.sendSimpleMessageToAgent("email-content-creator-agent", ContentMaker.fromMultiModalData(content));
     }
 }

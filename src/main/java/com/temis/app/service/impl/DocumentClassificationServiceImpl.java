@@ -36,9 +36,7 @@ public class DocumentClassificationServiceImpl implements DocumentClassification
             str.append('\n');
         }
 
-        var response = documentClassifierAgent.Classify(document.getPath(), document.getFileType(), str.toString());
-
-        var result = ResponseHandler.getText(response).trim();
+        var result = documentClassifierAgent.Classify(document.getPath(), document.getFileType(), str.toString());
 
         long id = 0;
 

@@ -26,7 +26,7 @@ public class DraftEmailService {
         
         var result = emailContentCreatorAgent.CreateEmailContent(inputJson);
         
-        var email = ResponseHandler.getText(result)
+        var email = result
                 .replace("```html", "")
                 .replace("```", "")
                 .replace("<!DOCTYPE html>", "")

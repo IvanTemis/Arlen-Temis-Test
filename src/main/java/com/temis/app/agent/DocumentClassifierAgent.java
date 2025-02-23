@@ -21,7 +21,7 @@ public class DocumentClassifierAgent {
     }
 
 
-    public GenerateContentResponse Classify(String gsUrl, String mimeType, String context) throws Exception {
+    public String Classify(String gsUrl, String mimeType, String context) throws Exception {
         var content = VertexAIUtils.ContentWithDocument("Clasifica este documento\n" + context, gsUrl, mimeType);
 
         return agentManager.sendSimpleMessageToAgent("document-classifier-agent", content);

@@ -7,7 +7,7 @@ import com.temis.app.entity.UserEntity;
 
 public interface ClientVirtualAssistantService {
 
-    String respondToUserMessage(Content content, UserEntity user, String agentId, MessageContextEntity messageContext) throws Exception;
+    String respondToUserMessage(MessageContextEntity messageContext, UserEntity user, String agentId) throws Exception;
     String generateCompanyIncorporationDraft(String inputJson, UserEntity user) throws Exception;
 
 }

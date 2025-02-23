@@ -39,28 +39,18 @@ public class ClientVirtualAssistantServiceImpl implements ClientVirtualAssistant
     private CloudStorageClient cloudStorageClient;
 
     @Autowired
-    VertexAiContentRepository vertexAiContextRepository;
-
-    @Autowired
     private DraftEmailService draftEmailService;
 
     @Override
-    public String respondToUserMessage(Content content, UserEntity user, String agentId, MessageContextEntity messageContext) throws Exception {
+    public String respondToUserMessage(MessageContextEntity messageContext, UserEntity user, String agentId) throws Exception {
 
-        var contexts = vertexAiContextRepository.findByUserEntityOrderByCreatedDateAsc(user);
+        var content = messageContext.toVertexAiContent();
 
-        var history = VertexAIUtils.VertexAiContentEntityToContent(contexts);
-
-        vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, content, agentId));
-
-        var response = agentManager.sendMessageToAgent(agentId, content, history, new HashMap<>(){{
+        var response = agentManager.sendMessageToAgentAsUser(agentId, user, content, new HashMap<>(){{
             put("messageContext", messageContext);
-            put("user", messageContext.getUserEntity());
         }});
 
-        vertexAiContextRepository.save(VertexAiContentEntity.fromContent(user, ResponseHandler.getContent(response), agentId));
-
-        return ResponseHandler.getText(response);
+        return response;
     }
 
 

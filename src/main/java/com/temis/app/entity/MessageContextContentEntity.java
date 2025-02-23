@@ -1,6 +1,10 @@
 package com.temis.app.entity;
 
+import com.google.cloud.vertexai.api.Content;
+import com.google.cloud.vertexai.api.FileData;
+import com.google.cloud.vertexai.api.Part;
 import com.temis.app.converter.JsonConverter;
+import com.temis.app.model.VertexAiRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -55,4 +59,8 @@ public class MessageContextContentEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private Date createdDate;
+
+    public boolean isEmpty(){
+        return body.isEmpty() && documentEntity == null;
+    }
 }

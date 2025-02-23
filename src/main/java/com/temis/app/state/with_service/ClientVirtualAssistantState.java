@@ -50,47 +50,19 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
     @Override
     protected void ExecuteWithService(MessageContextEntity message, MessageResponseEntity.MessageResponseEntityBuilder responseBuilder, UserEntity user, ServiceEntity service) throws Exception {
 
-        int processed = 0;
-        var aiContentBuilder = Content.newBuilder().setRole(VertexAiRole.USER.name());
-        for (MessageContextContentEntity content : message.getMessageContents()) {
-            if (content.getDocumentEntity() == null && content.getBody().isEmpty()) continue;
-
-            String text = content.getBody();
-            if (text == null || text.isEmpty()) {
-                text = "documento";
-
-                if (content.getDocumentEntity().getDocumentType() != null) {
-                    text += " ";
-                    text += content.getDocumentEntity().getDocumentType().getName();
-                }
-
-                text += ":";
-            }
-            text += "\n";
-            aiContentBuilder.addParts(Part.newBuilder().setText(text));
-
-            if (content.getDocumentEntity() != null) {
-                aiContentBuilder.addParts(Part.newBuilder().setFileData(
-                        FileData.newBuilder()
-                                .setMimeType(content.getDocumentEntity().getFileType())
-                                .setFileUri(content.getDocumentEntity().getPath())
-                ));
-            }
-
-            processed++;
-        }
-
-        if (processed == 0) {
+        if (message.isEmpty()) {
             responseBuilder.addContent("Lo siento, no puedo procesar mensajes vacíos.");
             return;
         }
+
+        Content content = message.toVertexAiContent();
 
         String result = "You shouldn't be here.";
         var serviceStage = service.getServiceStage();
 
         switch (serviceStage) {
             case SOCIETY_IDENTIFICATION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
+                result = clientVirtualAssistantService.respondToUserMessage(message, user, serviceStage.getAgentId());
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.DOCUMENT_COLLECTION, service);
@@ -98,7 +70,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 }
             }
             case DOCUMENT_COLLECTION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
+                result = clientVirtualAssistantService.respondToUserMessage(message, user, serviceStage.getAgentId());
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.ORGANIZATIONAL_STRUCTURE, service);
@@ -106,7 +78,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 }
             }
             case ORGANIZATIONAL_STRUCTURE -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
+                result = clientVirtualAssistantService.respondToUserMessage(message, user, serviceStage.getAgentId());
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.PAYMENT_COLLECTION, service);
@@ -114,7 +86,7 @@ public class ClientVirtualAssistantState extends StateWithServiceTemplate {
                 }
             }
             case PAYMENT_COLLECTION -> {
-                result = clientVirtualAssistantService.respondToUserMessage(aiContentBuilder.build(), user, serviceStage.getAgentId(), message);
+                result = clientVirtualAssistantService.respondToUserMessage(message, user, serviceStage.getAgentId());
 
                 if (result.contains(END_STAGE_1)) {
                     MessageParts messageParts = ExtractEndMessage(result, serviceStage, ServiceStage.COMPANY_INCORPORATION, service);

@@ -1,6 +1,10 @@
 package com.temis.app.entity;
 
+import com.google.cloud.vertexai.api.Content;
+import com.google.cloud.vertexai.api.FileData;
+import com.google.cloud.vertexai.api.Part;
 import com.temis.app.model.MessageSource;
+import com.temis.app.model.VertexAiRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -87,5 +91,44 @@ public class MessageContextEntity {
         }
 
         return stringBuilder.toString();
+    }
+
+    public boolean isEmpty(){
+        for (MessageContextContentEntity messageContent : messageContents) {
+            if(!messageContent.isEmpty()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public Content toVertexAiContent(){
+        var aiContentBuilder = Content.newBuilder().setRole(VertexAiRole.USER.name());
+        for (MessageContextContentEntity content : this.getMessageContents()) {
+            if (content.isEmpty()) continue;
+
+            String text = content.getBody();
+            if (text == null || text.isEmpty()) {
+                text = "documento";
+
+                if (content.getDocumentEntity() != null && content.getDocumentEntity().getDocumentType() != null) {
+                    text += " ";
+                    text += content.getDocumentEntity().getDocumentType().getName();
+                }
+
+                text += ":";
+            }
+            text += "\n";
+            aiContentBuilder.addParts(Part.newBuilder().setText(text));
+
+            if (content.getDocumentEntity() != null) {
+                aiContentBuilder.addParts(Part.newBuilder().setFileData(
+                        FileData.newBuilder()
+                                .setMimeType(content.getDocumentEntity().getFileType())
+                                .setFileUri(content.getDocumentEntity().getPath())
+                ));
+            }
+        }
+        return aiContentBuilder.build();
     }
 }
